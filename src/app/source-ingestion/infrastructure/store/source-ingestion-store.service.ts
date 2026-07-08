@@ -1,12 +1,14 @@
-import {Injectable, signal} from '@angular/core';
+import {Injectable, signal, inject} from '@angular/core';
 import {SourceFile} from '../../domain/value-objects/SourceFile';
 import {IngestionJob} from '../../domain/entities/IngestionJob';
 import {DomainError} from '../../domain/DomainError';
+import {StartSourceIngestionUseCase} from '../../application/StartSourceIngestionUseCase';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SourceIngestionStore {
+  private readonly startIngestionUseCase = inject(StartSourceIngestionUseCase);
   private readonly source = signal<SourceFile | null>(null);
   private readonly job = signal<IngestionJob | null>(null);
   private readonly validation = signal<string>('');
@@ -30,5 +32,19 @@ export class SourceIngestionStore {
 
       throw error;
     }
+  }
+
+  async startIngestion(): Promise<void> {
+    const selectedSource = this.source();
+    if (!selectedSource) {
+      return;
+    }
+
+    const job = await this.startIngestionUseCase.execute({
+      name: selectedSource.name,
+      size: selectedSource.size,
+      type: selectedSource.type,
+    });
+    this.job.set(job);
   }
 }
