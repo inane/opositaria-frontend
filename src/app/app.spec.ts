@@ -1,8 +1,8 @@
-import {afterEach, beforeEach, describe, expect, it} from 'vitest';
-import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {provideRouter} from '@angular/router';
-import {App} from './app';
-import {routes} from './app.routes';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { App } from './app';
+import { routes } from './app.routes';
 
 describe('App', () => {
   let fixture: ComponentFixture<App>;

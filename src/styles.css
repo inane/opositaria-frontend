@@ -1,1 +1,4 @@
-/* You can add global styles to this file, and also import other style files */
+@import './app/shared/ui/styles/tokens.css';
+@import './app/shared/ui/styles/reset.css';
+@import './app/shared/ui/styles/typography.css';
+@import './app/shared/ui/styles/motion.css';

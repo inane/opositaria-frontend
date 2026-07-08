@@ -1,0 +1,26 @@
+/* Shared motion tokens with reduced-motion respect. */
+
+@media (prefers-reduced-motion: no-preference) {
+  :root {
+    --opo-motion-transition-fast: var(--opo-motion-fast) var(--opo-motion-ease);
+    --opo-motion-transition-medium: var(--opo-motion-medium) var(--opo-motion-ease);
+    --opo-motion-transition-slow: var(--opo-motion-slow) var(--opo-motion-ease);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --opo-motion-transition-fast: 0ms;
+    --opo-motion-transition-medium: 0ms;
+    --opo-motion-transition-slow: 0ms;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+    scroll-behavior: auto;
+    transition-duration: 0.01ms;
+  }
+}

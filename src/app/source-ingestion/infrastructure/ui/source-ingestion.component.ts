@@ -1,91 +1,117 @@
 import { Component, inject } from '@angular/core';
+import {
+  AlertComponent,
+  BadgeComponent,
+  ButtonComponent,
+  CardComponent,
+  PageHeaderComponent,
+  PageSectionComponent,
+  StatusPanelComponent,
+  UploadDropzoneComponent,
+} from '../../../shared/ui';
 import { SourceIngestionStore } from '../store/source-ingestion-store.service';
 import { IngestionStatus } from '../../domain/value-objects/IngestionStatus';
+import { IngestionJob } from '../../domain/entities/IngestionJob';
 
 @Component({
   selector: 'app-source-ingestion',
-  imports: [],
+  imports: [
+    AlertComponent,
+    BadgeComponent,
+    ButtonComponent,
+    CardComponent,
+    PageHeaderComponent,
+    PageSectionComponent,
+    StatusPanelComponent,
+    UploadDropzoneComponent,
+  ],
   template: `
-    <section class="source-ingestion">
-      <h1>Upload your study source</h1>
-      <p>Start building your knowledge base by uploading a PDF from your exam syllabus.</p>
+    <opo-page-header
+      title="Upload your study source"
+      description="Start building your knowledge base by uploading a PDF from your exam syllabus."
+    />
 
-      <label for="source-file">Source file</label>
-      <input
-        id="source-file"
-        type="file"
-        accept=".pdf"
-        aria-label="Select a PDF source file"
-        (change)="onFileSelected($event)"
-      />
+    <opo-page-section
+      title="Source file"
+      description="Select one PDF document from your exam syllabus to begin."
+    >
+      <opo-card>
+        <opo-upload-dropzone
+          label="Upload source"
+          description="Only PDF files are supported in the initial MVP."
+          accept=".pdf"
+          (fileSelected)="onFileSelected($event)"
+        />
+      </opo-card>
+    </opo-page-section>
 
-      @if (store.validationMessage(); as message) {
-        <p class="validation-message" role="alert">{{ message }}</p>
-      }
+    @if (store.validationMessage(); as message) {
+      <opo-alert tone="error">{{ message }}</opo-alert>
+    }
 
-      @if (store.selectedSource(); as source) {
-        <p class="selected-source">Selected: {{ source.name }}</p>
-      }
+    @if (store.selectedSource(); as source) {
+      <p class="selected-source">
+        Selected: <opo-badge tone="info">{{ source.name }}</opo-badge>
+      </p>
+    }
 
-      <button type="button" [disabled]="!store.selectedSource()" (click)="onStartIngestion()">
-        Start ingestion
-      </button>
+    <opo-button type="button" [disabled]="!store.selectedSource()" (pressed)="onStartIngestion()">
+      Start ingestion
+    </opo-button>
 
-      @if (store.ingestionJob(); as job) {
-        <div class="ingestion-status" role="status" aria-live="polite">
-          @switch (job.status) {
-            @case (ingestionStatus.PENDING) {
-              Pending: your source has been received and is waiting to be processed.
-            }
-            @case (ingestionStatus.PROCESSING) {
-              Processing: your source is being processed.
-            }
-            @case (ingestionStatus.DONE) {
-              Done: your source is ready to use.
-            }
-            @case (ingestionStatus.ERROR) {
-              Error: {{ job.recoveryMessage }}
-              <button type="button" data-testid="retry-ingestion" (click)="onStartIngestion()">
-                Try again
-              </button>
-            }
-          }
-        </div>
-      }
+    @if (store.ingestionJob(); as job) {
+      <opo-status-panel [tone]="toneFor(job)" [title]="titleFor(job)" [message]="messageFor(job)">
+        @if (job.status === ingestionStatus.ERROR) {
+          <opo-button type="button" data-testid="retry-ingestion" (pressed)="onStartIngestion()">
+            Try again
+          </opo-button>
+        }
+      </opo-status-panel>
+    }
 
-      @if (store.ingestionJob()?.status === ingestionStatus.DONE) {
-        <section class="future-actions" aria-label="Upcoming study actions">
-          <h2>Study actions</h2>
-          <ul>
+    @if (store.ingestionJob()?.status === ingestionStatus.DONE) {
+      <opo-page-section title="Study actions" description="These features will be available soon.">
+        <opo-card variant="muted">
+          <ul class="future-actions">
             <li>
-              <button type="button" data-testid="action-chat" aria-disabled="true" disabled>
+              <opo-button type="button" variant="ghost" [disabled]="true" data-testid="action-chat">
                 Chat with sources
-              </button>
+              </opo-button>
             </li>
             <li>
-              <button type="button" data-testid="action-summary" aria-disabled="true" disabled>
+              <opo-button
+                type="button"
+                variant="ghost"
+                [disabled]="true"
+                data-testid="action-summary"
+              >
                 Summaries by topic
-              </button>
+              </opo-button>
             </li>
             <li>
-              <button type="button" data-testid="action-test" aria-disabled="true" disabled>
+              <opo-button type="button" variant="ghost" [disabled]="true" data-testid="action-test">
                 Automatic tests
-              </button>
+              </opo-button>
             </li>
             <li>
-              <button type="button" data-testid="action-plan" aria-disabled="true" disabled>
+              <opo-button type="button" variant="ghost" [disabled]="true" data-testid="action-plan">
                 Adaptive plan
-              </button>
+              </opo-button>
             </li>
             <li>
-              <button type="button" data-testid="action-recommendations" aria-disabled="true" disabled>
+              <opo-button
+                type="button"
+                variant="ghost"
+                [disabled]="true"
+                data-testid="action-recommendations"
+              >
                 Recommendations
-              </button>
+              </opo-button>
             </li>
           </ul>
-        </section>
-      }
-    </section>
+        </opo-card>
+      </opo-page-section>
+    }
   `,
   styleUrl: './source-ingestion.component.css',
 })
@@ -93,15 +119,50 @@ export class SourceIngestionComponent {
   protected readonly store = inject(SourceIngestionStore);
   protected readonly ingestionStatus = IngestionStatus;
 
-  onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (file) {
-      this.store.selectSource(file);
+  onFileSelected(file: File): void {
+    this.store.selectSource(file);
+  }
+
+  async onStartIngestion(): Promise<void> {
+    await this.store.startIngestion();
+  }
+
+  toneFor(job: IngestionJob): 'neutral' | 'info' | 'success' | 'warning' | 'error' {
+    switch (job.status) {
+      case IngestionStatus.PENDING:
+        return 'neutral';
+      case IngestionStatus.PROCESSING:
+        return 'info';
+      case IngestionStatus.DONE:
+        return 'success';
+      case IngestionStatus.ERROR:
+        return 'error';
     }
   }
 
-  onStartIngestion(): void {
-    this.store.startIngestion();
+  titleFor(job: IngestionJob): string {
+    switch (job.status) {
+      case IngestionStatus.PENDING:
+        return 'Pending';
+      case IngestionStatus.PROCESSING:
+        return 'Processing';
+      case IngestionStatus.DONE:
+        return 'Done';
+      case IngestionStatus.ERROR:
+        return 'Error';
+    }
+  }
+
+  messageFor(job: IngestionJob): string {
+    switch (job.status) {
+      case IngestionStatus.PENDING:
+        return 'Your source has been received and is waiting to be processed.';
+      case IngestionStatus.PROCESSING:
+        return 'Your source is being processed.';
+      case IngestionStatus.DONE:
+        return 'Your source is ready to use.';
+      case IngestionStatus.ERROR:
+        return job.recoveryMessage ?? 'Ingestion failed.';
+    }
   }
 }

@@ -1,0 +1,50 @@
+:host {
+  display: block;
+}
+
+.status-panel {
+  border: 1px solid transparent;
+  border-radius: var(--opo-radius-md);
+  padding: var(--opo-space-4);
+}
+
+.status-panel-title {
+  display: block;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-block-end: var(--opo-space-1);
+}
+
+.status-panel-message {
+  color: var(--opo-color-text-muted);
+  margin-block-end: var(--opo-space-3);
+}
+
+.status-panel-actions {
+  display: flex;
+  gap: var(--opo-space-2);
+}
+
+.status-panel[data-tone='neutral'] {
+  background-color: var(--opo-color-surface-muted);
+}
+
+.status-panel[data-tone='info'] {
+  background-color: var(--opo-color-primary-alpha-8);
+  border-color: var(--opo-color-primary-alpha-20);
+}
+
+.status-panel[data-tone='success'] {
+  background-color: var(--opo-color-success-alpha-8);
+  border-color: var(--opo-color-success-alpha-20);
+}
+
+.status-panel[data-tone='warning'] {
+  background-color: var(--opo-color-warning-alpha-8);
+  border-color: var(--opo-color-warning-alpha-20);
+}
+
+.status-panel[data-tone='error'] {
+  background-color: var(--opo-color-danger-alpha-8);
+  border-color: var(--opo-color-danger-alpha-20);
+}

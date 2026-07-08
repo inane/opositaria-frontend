@@ -1,0 +1,45 @@
+:host {
+  display: inline-block;
+}
+
+.badge {
+  border: 1px solid transparent;
+  border-radius: var(--opo-radius-sm);
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  padding-block: var(--opo-space-1);
+  padding-inline: var(--opo-space-2);
+  text-transform: uppercase;
+}
+
+:host([data-tone='neutral']) .badge {
+  background-color: var(--opo-color-surface-muted);
+  border-color: var(--opo-color-text-muted);
+  color: var(--opo-color-text-muted);
+}
+
+:host([data-tone='info']) .badge {
+  background-color: var(--opo-color-primary-alpha-8);
+  border-color: var(--opo-color-primary-alpha-20);
+  color: var(--opo-color-primary);
+}
+
+:host([data-tone='success']) .badge {
+  background-color: var(--opo-color-success-alpha-8);
+  border-color: var(--opo-color-success-alpha-20);
+  color: var(--opo-color-success);
+}
+
+:host([data-tone='warning']) .badge {
+  background-color: var(--opo-color-warning-alpha-8);
+  border-color: var(--opo-color-warning-alpha-20);
+  color: var(--opo-color-warning);
+}
+
+:host([data-tone='error']) .badge {
+  background-color: var(--opo-color-danger-alpha-8);
+  border-color: var(--opo-color-danger-alpha-20);
+  color: var(--opo-color-danger);
+}

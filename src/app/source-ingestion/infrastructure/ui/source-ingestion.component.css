@@ -2,6 +2,14 @@
   display: block;
 }
 
-.source-ingestion {
-  padding: 1.5rem;
+.selected-source {
+  margin-block: var(--opo-space-4);
+}
+
+.future-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--opo-space-2);
+  list-style: none;
+  padding: 0;
 }
