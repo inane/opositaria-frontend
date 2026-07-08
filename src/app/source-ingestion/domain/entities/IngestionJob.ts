@@ -4,6 +4,7 @@ export class IngestionJob {
   private constructor(
     readonly jobId: string,
     readonly status: IngestionStatus,
+    readonly recoveryMessage: string = '',
   ) {}
 
   static create(jobId: string): IngestionJob {
@@ -16,5 +17,9 @@ export class IngestionJob {
 
   complete(): IngestionJob {
     return new IngestionJob(this.jobId, IngestionStatus.DONE);
+  }
+
+  fail(recoveryMessage: string): IngestionJob {
+    return new IngestionJob(this.jobId, IngestionStatus.ERROR, recoveryMessage);
   }
 }

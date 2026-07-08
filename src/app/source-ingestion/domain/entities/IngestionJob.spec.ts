@@ -25,4 +25,13 @@ describe('The IngestionJob', () => {
 
     expect(doneJob.status).toBe(IngestionStatus.DONE);
   });
+
+  it('marks a job as failed with a recovery message', () => {
+    const job = IngestionJob.create('job-1').startProcessing();
+
+    const failedJob = job.fail('Ingestion could not be completed');
+
+    expect(failedJob.status).toBe(IngestionStatus.ERROR);
+    expect(failedJob.recoveryMessage).toBe('Ingestion could not be completed');
+  });
 });
