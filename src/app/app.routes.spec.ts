@@ -21,4 +21,12 @@ describe('The application routes', () => {
 
     expect(router.url).toBe('/source-ingestion');
   });
+
+  it('redirects the root path to the source ingestion screen', async () => {
+    const router = TestBed.inject(Router);
+
+    await router.navigate(['']);
+
+    expect(router.url).toBe('/source-ingestion');
+  });
 });
