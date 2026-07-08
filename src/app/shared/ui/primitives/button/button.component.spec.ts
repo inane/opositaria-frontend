@@ -1,14 +1,20 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ButtonComponent } from './button.component';
 
 @Component({
   imports: [ButtonComponent],
-  template: `<opo-button [disabled]="isDisabled">Start ingestion</opo-button>`,
+  template: `
+    <opo-button
+      [disabled]="isDisabled"
+      (pressed)="onPressed()"
+    >Start ingestion</opo-button>
+  `,
 })
 class TestHostComponent {
   isDisabled = false;
+  onPressed = vi.fn();
 }
 
 describe('The ButtonComponent', () => {
@@ -49,5 +55,24 @@ describe('The ButtonComponent', () => {
     const button = fixture.nativeElement.querySelector('button');
 
     expect(button.disabled).toBe(true);
+  });
+
+  it('emits pressed output when enabled', () => {
+    fixture.detectChanges();
+
+    const button = fixture.nativeElement.querySelector('button');
+    button.click();
+
+    expect(fixture.componentInstance.onPressed).toHaveBeenCalled();
+  });
+
+  it('does not emit pressed output when disabled', () => {
+    fixture.componentInstance.isDisabled = true;
+    fixture.detectChanges();
+
+    const button = fixture.nativeElement.querySelector('button');
+    button.click();
+
+    expect(fixture.componentInstance.onPressed).not.toHaveBeenCalled();
   });
 });
