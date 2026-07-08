@@ -1,0 +1,23 @@
+:host {
+  display: block;
+}
+
+.page-section {
+  margin-block-end: var(--opo-space-8);
+}
+
+.page-section-title {
+  font-size: 1.25rem;
+  margin-block-end: var(--opo-space-2);
+}
+
+.page-section-description {
+  color: var(--opo-color-text-muted);
+  font-size: 1rem;
+  margin-block-end: var(--opo-space-4);
+  max-inline-size: 64ch;
+}
+
+.page-section-body {
+  display: block;
+}
