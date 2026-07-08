@@ -31,4 +31,12 @@ describe('The ButtonComponent', () => {
     expect(button).toBeTruthy();
     expect(button.textContent).toContain('Start ingestion');
   });
+
+  it('defaults to type button', () => {
+    fixture.detectChanges();
+
+    const button = fixture.nativeElement.querySelector('button');
+
+    expect(button.getAttribute('type')).toBe('button');
+  });
 });
