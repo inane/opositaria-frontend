@@ -23,4 +23,15 @@ describe('The FakeSourceIngestionAdapter', () => {
 
     expect(updatedJob.status).toBe(IngestionStatus.PROCESSING);
   });
+
+  it('advances a processing job to done when status is read again', async () => {
+    const adapter = new FakeSourceIngestionAdapter();
+    const sourceFile = SourceFile.create({name: 'exam.pdf', size: 1024, type: 'application/pdf'});
+    const job = await adapter.start(sourceFile);
+    await adapter.status(job.jobId);
+
+    const doneJob = await adapter.status(job.jobId);
+
+    expect(doneJob.status).toBe(IngestionStatus.DONE);
+  });
 });

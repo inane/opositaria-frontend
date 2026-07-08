@@ -27,6 +27,13 @@ export class FakeSourceIngestionAdapter implements SourceIngestionGateway {
       return processingJob;
     }
 
+    if (job.status === IngestionStatus.PROCESSING) {
+      const doneJob = job.complete();
+      this.jobs.set(jobId, doneJob);
+
+      return doneJob;
+    }
+
     return job;
   }
 }
