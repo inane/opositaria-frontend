@@ -1,6 +1,7 @@
 import {Injectable, signal} from '@angular/core';
 import {SourceFile} from '../../domain/value-objects/SourceFile';
 import {IngestionJob} from '../../domain/entities/IngestionJob';
+import {DomainError} from '../../domain/DomainError';
 
 @Injectable({
   providedIn: 'root',
@@ -15,8 +16,19 @@ export class SourceIngestionStore {
   readonly validationMessage = this.validation.asReadonly();
 
   selectSource(file: File): void {
-    const sourceFile = SourceFile.create({name: file.name, size: file.size, type: file.type});
-    this.source.set(sourceFile);
-    this.validation.set('');
+    try {
+      const sourceFile = SourceFile.create({name: file.name, size: file.size, type: file.type});
+      this.source.set(sourceFile);
+      this.validation.set('');
+    } catch (error) {
+      if (error instanceof DomainError) {
+        this.source.set(null);
+        this.validation.set(error.message);
+
+        return;
+      }
+
+      throw error;
+    }
   }
 }
