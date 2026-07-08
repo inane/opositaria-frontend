@@ -5,9 +5,11 @@ import { ButtonComponent } from './button.component';
 
 @Component({
   imports: [ButtonComponent],
-  template: `<opo-button>Start ingestion</opo-button>`,
+  template: `<opo-button [disabled]="isDisabled">Start ingestion</opo-button>`,
 })
-class TestHostComponent {}
+class TestHostComponent {
+  isDisabled = false;
+}
 
 describe('The ButtonComponent', () => {
   let fixture: ComponentFixture<TestHostComponent>;
@@ -38,5 +40,14 @@ describe('The ButtonComponent', () => {
     const button = fixture.nativeElement.querySelector('button');
 
     expect(button.getAttribute('type')).toBe('button');
+  });
+
+  it('exposes disabled native semantics', () => {
+    fixture.componentInstance.isDisabled = true;
+    fixture.detectChanges();
+
+    const button = fixture.nativeElement.querySelector('button');
+
+    expect(button.disabled).toBe(true);
   });
 });
