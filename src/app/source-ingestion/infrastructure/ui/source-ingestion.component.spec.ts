@@ -89,4 +89,22 @@ describe('The SourceIngestionComponent', () => {
 
     expect(fixture.nativeElement.textContent).toContain('Processing');
   });
+
+  it('shows done feedback when ingestion completes', async () => {
+    const file = new File(['content'], 'exam.pdf', {type: 'application/pdf'});
+    const input = fixture.nativeElement.querySelector('input[type="file"]');
+    Object.defineProperty(input, 'files', {value: [file]});
+    input.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    fixture.nativeElement.querySelector('button').click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    await store.refreshStatus();
+    await store.refreshStatus();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('Done');
+  });
 });
