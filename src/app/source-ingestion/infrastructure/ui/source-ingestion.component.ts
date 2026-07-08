@@ -21,6 +21,14 @@ import {SourceIngestionStore} from '../store/source-ingestion-store.service';
       @if (store.selectedSource(); as source) {
         <p class="selected-source">Selected: {{ source.name }}</p>
       }
+
+      <button
+        type="button"
+        [disabled]="!store.selectedSource()"
+        (click)="onStartIngestion()"
+      >
+        Start ingestion
+      </button>
     </section>
   `,
   styleUrl: './source-ingestion.component.css',
@@ -34,5 +42,9 @@ export class SourceIngestionComponent {
     if (file) {
       this.store.selectSource(file);
     }
+  }
+
+  onStartIngestion(): void {
+    this.store.startIngestion();
   }
 }

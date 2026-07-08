@@ -45,4 +45,12 @@ describe('The SourceIngestionComponent', () => {
 
     expect(fixture.nativeElement.textContent).toContain('exam.pdf');
   });
+
+  it('disables the start action without a selected PDF', () => {
+    fixture.detectChanges();
+
+    const button = fixture.nativeElement.querySelector('button');
+
+    expect(button?.disabled).toBe(true);
+  });
 });
