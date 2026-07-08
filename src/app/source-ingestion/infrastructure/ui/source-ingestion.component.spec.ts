@@ -129,4 +129,45 @@ describe('The SourceIngestionComponent', () => {
 
     expect(retryButton).toBeTruthy();
   });
+
+  it('does not show study actions while ingestion is pending', async () => {
+    const file = new File(['content'], 'exam.pdf', {type: 'application/pdf'});
+    const input = fixture.nativeElement.querySelector('input[type="file"]');
+    Object.defineProperty(input, 'files', {value: [file]});
+    input.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    fixture.nativeElement.querySelector('button').click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const chatAction = fixture.nativeElement.querySelector('[data-testid="action-chat"]');
+    const summaryAction = fixture.nativeElement.querySelector('[data-testid="action-summary"]');
+
+    expect(chatAction).toBeNull();
+    expect(summaryAction).toBeNull();
+  });
+
+  it('shows future study action placeholders when ingestion is done', async () => {
+    const file = new File(['content'], 'exam.pdf', {type: 'application/pdf'});
+    const input = fixture.nativeElement.querySelector('input[type="file"]');
+    Object.defineProperty(input, 'files', {value: [file]});
+    input.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    fixture.nativeElement.querySelector('button').click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    await store.refreshStatus();
+    await store.refreshStatus();
+    fixture.detectChanges();
+
+    const chatAction = fixture.nativeElement.querySelector('[data-testid="action-chat"]');
+    const summaryAction = fixture.nativeElement.querySelector('[data-testid="action-summary"]');
+
+    expect(chatAction).toBeTruthy();
+    expect(summaryAction).toBeTruthy();
+    expect(chatAction?.getAttribute('aria-disabled')).toBe('true');
+  });
 });

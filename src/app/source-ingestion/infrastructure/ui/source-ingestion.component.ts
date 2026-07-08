@@ -56,6 +56,59 @@ import {IngestionStatus} from '../../domain/value-objects/IngestionStatus';
           }
         </p>
       }
+
+      @if (store.ingestionJob()?.status === ingestionStatus.DONE) {
+        <section class="future-actions" aria-label="Upcoming study actions">
+          <h2>Study actions</h2>
+          <ul>
+            <li>
+              <button
+                type="button"
+                data-testid="action-chat"
+                aria-disabled="true"
+              >
+                Chat with sources
+              </button>
+            </li>
+            <li>
+              <button
+                type="button"
+                data-testid="action-summary"
+                aria-disabled="true"
+              >
+                Summaries by topic
+              </button>
+            </li>
+            <li>
+              <button
+                type="button"
+                data-testid="action-test"
+                aria-disabled="true"
+              >
+                Automatic tests
+              </button>
+            </li>
+            <li>
+              <button
+                type="button"
+                data-testid="action-plan"
+                aria-disabled="true"
+              >
+                Adaptive plan
+              </button>
+            </li>
+            <li>
+              <button
+                type="button"
+                data-testid="action-recommendations"
+                aria-disabled="true"
+              >
+                Recommendations
+              </button>
+            </li>
+          </ul>
+        </section>
+      }
     </section>
   `,
   styleUrl: './source-ingestion.component.css',
