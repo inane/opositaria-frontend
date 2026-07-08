@@ -1,0 +1,50 @@
+:host {
+  display: block;
+}
+
+.status-panel {
+  border: 1px solid transparent;
+  border-radius: var(--opo-radius-md);
+  padding: var(--opo-space-4);
+}
+
+.status-panel-title {
+  display: block;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-block-end: var(--opo-space-1);
+}
+
+.status-panel-message {
+  color: var(--opo-color-text-muted);
+  margin-block-end: var(--opo-space-3);
+}
+
+.status-panel-actions {
+  display: flex;
+  gap: var(--opo-space-2);
+}
+
+.status-panel[data-tone='neutral'] {
+  background-color: var(--opo-color-surface-muted);
+}
+
+.status-panel[data-tone='info'] {
+  background-color: rgb(37 99 235 / 0.08);
+  border-color: rgb(37 99 235 / 0.2);
+}
+
+.status-panel[data-tone='success'] {
+  background-color: rgb(22 163 74 / 0.08);
+  border-color: rgb(22 163 74 / 0.2);
+}
+
+.status-panel[data-tone='warning'] {
+  background-color: rgb(217 119 6 / 0.08);
+  border-color: rgb(217 119 6 / 0.2);
+}
+
+.status-panel[data-tone='error'] {
+  background-color: rgb(220 38 38 / 0.08);
+  border-color: rgb(220 38 38 / 0.2);
+}
