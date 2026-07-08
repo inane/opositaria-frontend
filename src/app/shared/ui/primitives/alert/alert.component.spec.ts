@@ -49,6 +49,24 @@ describe('The AlertComponent', () => {
     expect(alert).toBeFalsy();
   });
 
+  it('exposes role alert for warning tone', () => {
+    fixture.componentInstance.tone = 'warning';
+    fixture.detectChanges();
+
+    const alert = fixture.nativeElement.querySelector('[role="alert"]');
+
+    expect(alert).toBeTruthy();
+  });
+
+  it('avoids interruptive alert role for success tone', () => {
+    fixture.componentInstance.tone = 'success';
+    fixture.detectChanges();
+
+    const alert = fixture.nativeElement.querySelector('[role="alert"]');
+
+    expect(alert).toBeFalsy();
+  });
+
   it('renders optional title when provided', () => {
     fixture.componentInstance.title = 'Validation failed';
     fixture.detectChanges();

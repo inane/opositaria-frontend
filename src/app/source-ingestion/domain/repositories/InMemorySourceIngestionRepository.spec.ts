@@ -62,4 +62,27 @@ describe('The InMemorySourceIngestionRepository', () => {
     expect(failedJob.status).toBe(IngestionStatus.ERROR);
     expect(failedJob.recoveryMessage).toBe('Ingestion failed. Please try again.');
   });
+
+  it('reports a not-found error for an unknown job identifier', async () => {
+    const repository = new InMemorySourceIngestionRepository();
+
+    await expect(repository.status('unknown-job')).rejects.toThrow('Job unknown-job not found');
+  });
+
+  it('keeps a done job unchanged on subsequent status reads', async () => {
+    const repository = new InMemorySourceIngestionRepository();
+    const sourceFile = SourceFile.create({
+      name: 'exam.pdf',
+      size: 1024,
+      type: 'application/pdf',
+    });
+    const job = await repository.start(sourceFile);
+    await repository.status(job.jobId);
+    const doneJob = await repository.status(job.jobId);
+
+    const stableJob = await repository.status(job.jobId);
+
+    expect(stableJob.status).toBe(IngestionStatus.DONE);
+    expect(stableJob.jobId).toBe(doneJob.jobId);
+  });
 });

@@ -1,20 +1,23 @@
 import { Component, input, output } from '@angular/core';
 
+let nextUploadDropzoneId = 0;
+
 @Component({
   selector: 'opo-upload-dropzone',
   template: `
     <div class="dropzone" [class.dropzone-disabled]="disabled()">
-      <label class="dropzone-label" for="dropzone-input">{{ label() }}</label>
+      <label class="dropzone-label" [attr.for]="inputId">{{ label() }}</label>
 
       @if (description()) {
-        <p class="dropzone-description">{{ description() }}</p>
+        <p [attr.id]="descriptionId" class="dropzone-description">{{ description() }}</p>
       }
 
       <input
-        id="dropzone-input"
+        [id]="inputId"
         class="dropzone-input"
         type="file"
         [attr.accept]="accept()"
+        [attr.aria-describedby]="description() ? descriptionId : null"
         [disabled]="disabled()"
         (change)="onFileSelected($event)"
       />
@@ -23,6 +26,10 @@ import { Component, input, output } from '@angular/core';
   styleUrl: './upload-dropzone.component.css',
 })
 export class UploadDropzoneComponent {
+  private readonly instanceId = nextUploadDropzoneId++;
+  protected readonly inputId = `dropzone-input-${this.instanceId}`;
+  protected readonly descriptionId = `dropzone-description-${this.instanceId}`;
+
   readonly label = input.required<string>();
   readonly description = input('');
   readonly accept = input('');
@@ -34,8 +41,10 @@ export class UploadDropzoneComponent {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
 
-    if (file) {
-      this.fileSelected.emit(file);
+    if (!file) {
+      return;
     }
+
+    this.fileSelected.emit(file);
   }
 }

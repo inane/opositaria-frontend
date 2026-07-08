@@ -30,21 +30,21 @@
 }
 
 .status-panel[data-tone='info'] {
-  background-color: rgb(37 99 235 / 0.08);
-  border-color: rgb(37 99 235 / 0.2);
+  background-color: var(--opo-color-primary-alpha-8);
+  border-color: var(--opo-color-primary-alpha-20);
 }
 
 .status-panel[data-tone='success'] {
-  background-color: rgb(22 163 74 / 0.08);
-  border-color: rgb(22 163 74 / 0.2);
+  background-color: var(--opo-color-success-alpha-8);
+  border-color: var(--opo-color-success-alpha-20);
 }
 
 .status-panel[data-tone='warning'] {
-  background-color: rgb(217 119 6 / 0.08);
-  border-color: rgb(217 119 6 / 0.2);
+  background-color: var(--opo-color-warning-alpha-8);
+  border-color: var(--opo-color-warning-alpha-20);
 }
 
 .status-panel[data-tone='error'] {
-  background-color: rgb(220 38 38 / 0.08);
-  border-color: rgb(220 38 38 / 0.2);
+  background-color: var(--opo-color-danger-alpha-8);
+  border-color: var(--opo-color-danger-alpha-20);
 }

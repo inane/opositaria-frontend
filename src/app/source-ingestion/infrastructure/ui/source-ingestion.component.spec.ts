@@ -5,6 +5,21 @@ import { SOURCE_INGESTION_PORT } from '../tokens/source-ingestion-port.token';
 import { InMemorySourceIngestionRepository } from '../../domain/repositories/SourceIngestionRepository';
 import { SourceIngestionStore } from '../store/source-ingestion-store.service';
 
+function selectFile(fixture: ComponentFixture<SourceIngestionComponent>, file: File): void {
+  const input = fixture.nativeElement.querySelector('input[type="file"]');
+
+  Object.defineProperty(input, 'files', { value: [file] });
+  input.dispatchEvent(new Event('change'));
+  fixture.detectChanges();
+}
+
+async function startIngestion(fixture: ComponentFixture<SourceIngestionComponent>): Promise<void> {
+  fixture.nativeElement.querySelector('button').click();
+
+  await fixture.whenStable();
+  fixture.detectChanges();
+}
+
 describe('The SourceIngestionComponent', () => {
   let fixture: ComponentFixture<SourceIngestionComponent>;
   let store: SourceIngestionStore;
@@ -49,30 +64,24 @@ describe('The SourceIngestionComponent', () => {
 
   it('displays the selected PDF file name', () => {
     const file = new File(['content'], 'exam.pdf', { type: 'application/pdf' });
-    const input = fixture.nativeElement.querySelector('input[type="file"]');
-    Object.defineProperty(input, 'files', { value: [file] });
-    input.dispatchEvent(new Event('change'));
-    fixture.detectChanges();
+
+    selectFile(fixture, file);
 
     expect(fixture.nativeElement.textContent).toContain('exam.pdf');
   });
 
   it('displays a validation message when a non-PDF file is selected', () => {
     const file = new File(['content'], 'exam.txt', { type: 'text/plain' });
-    const input = fixture.nativeElement.querySelector('input[type="file"]');
-    Object.defineProperty(input, 'files', { value: [file] });
-    input.dispatchEvent(new Event('change'));
-    fixture.detectChanges();
+
+    selectFile(fixture, file);
 
     expect(fixture.nativeElement.textContent).toContain('Only PDF files are supported');
   });
 
   it('announces validation feedback through an alert region', () => {
     const file = new File(['content'], 'exam.txt', { type: 'text/plain' });
-    const input = fixture.nativeElement.querySelector('input[type="file"]');
-    Object.defineProperty(input, 'files', { value: [file] });
-    input.dispatchEvent(new Event('change'));
-    fixture.detectChanges();
+
+    selectFile(fixture, file);
 
     const alert = fixture.nativeElement.querySelector('[role="alert"]');
 
@@ -90,28 +99,18 @@ describe('The SourceIngestionComponent', () => {
 
   it('shows pending feedback after starting ingestion', async () => {
     const file = new File(['content'], 'exam.pdf', { type: 'application/pdf' });
-    const input = fixture.nativeElement.querySelector('input[type="file"]');
-    Object.defineProperty(input, 'files', { value: [file] });
-    input.dispatchEvent(new Event('change'));
-    fixture.detectChanges();
+    selectFile(fixture, file);
 
-    fixture.nativeElement.querySelector('button').click();
-    await fixture.whenStable();
-    fixture.detectChanges();
+    await startIngestion(fixture);
 
     expect(fixture.nativeElement.textContent).toContain('Pending');
   });
 
   it('announces ingestion status through a polite live region', async () => {
     const file = new File(['content'], 'exam.pdf', { type: 'application/pdf' });
-    const input = fixture.nativeElement.querySelector('input[type="file"]');
-    Object.defineProperty(input, 'files', { value: [file] });
-    input.dispatchEvent(new Event('change'));
-    fixture.detectChanges();
+    selectFile(fixture, file);
 
-    fixture.nativeElement.querySelector('button').click();
-    await fixture.whenStable();
-    fixture.detectChanges();
+    await startIngestion(fixture);
 
     const status = fixture.nativeElement.querySelector('[role="status"]');
 
@@ -120,16 +119,10 @@ describe('The SourceIngestionComponent', () => {
     expect(status.textContent).toContain('Pending');
   });
 
-  it('updates to processing status without reloading the page', async () => {
+  it('displays processing status after refreshing the job', async () => {
     const file = new File(['content'], 'exam.pdf', { type: 'application/pdf' });
-    const input = fixture.nativeElement.querySelector('input[type="file"]');
-    Object.defineProperty(input, 'files', { value: [file] });
-    input.dispatchEvent(new Event('change'));
-    fixture.detectChanges();
-
-    fixture.nativeElement.querySelector('button').click();
-    await fixture.whenStable();
-    fixture.detectChanges();
+    selectFile(fixture, file);
+    await startIngestion(fixture);
 
     await store.refreshStatus();
     fixture.detectChanges();
@@ -139,14 +132,8 @@ describe('The SourceIngestionComponent', () => {
 
   it('shows done feedback when ingestion completes', async () => {
     const file = new File(['content'], 'exam.pdf', { type: 'application/pdf' });
-    const input = fixture.nativeElement.querySelector('input[type="file"]');
-    Object.defineProperty(input, 'files', { value: [file] });
-    input.dispatchEvent(new Event('change'));
-    fixture.detectChanges();
-
-    fixture.nativeElement.querySelector('button').click();
-    await fixture.whenStable();
-    fixture.detectChanges();
+    selectFile(fixture, file);
+    await startIngestion(fixture);
 
     await store.refreshStatus();
     await store.refreshStatus();
@@ -157,14 +144,8 @@ describe('The SourceIngestionComponent', () => {
 
   it('shows error feedback with a recovery path when ingestion fails', async () => {
     const file = new File(['content'], 'error-exam.pdf', { type: 'application/pdf' });
-    const input = fixture.nativeElement.querySelector('input[type="file"]');
-    Object.defineProperty(input, 'files', { value: [file] });
-    input.dispatchEvent(new Event('change'));
-    fixture.detectChanges();
-
-    fixture.nativeElement.querySelector('button').click();
-    await fixture.whenStable();
-    fixture.detectChanges();
+    selectFile(fixture, file);
+    await startIngestion(fixture);
 
     await store.refreshStatus();
     await store.refreshStatus();
@@ -182,14 +163,8 @@ describe('The SourceIngestionComponent', () => {
 
   it('does not show study actions while ingestion is pending', async () => {
     const file = new File(['content'], 'exam.pdf', { type: 'application/pdf' });
-    const input = fixture.nativeElement.querySelector('input[type="file"]');
-    Object.defineProperty(input, 'files', { value: [file] });
-    input.dispatchEvent(new Event('change'));
-    fixture.detectChanges();
-
-    fixture.nativeElement.querySelector('button').click();
-    await fixture.whenStable();
-    fixture.detectChanges();
+    selectFile(fixture, file);
+    await startIngestion(fixture);
 
     const chatAction = fixture.nativeElement.querySelector('[data-testid="action-chat"]');
     const summaryAction = fixture.nativeElement.querySelector('[data-testid="action-summary"]');
@@ -198,33 +173,10 @@ describe('The SourceIngestionComponent', () => {
     expect(summaryAction).toBeNull();
   });
 
-  it('announces ingestion status for assistive technologies', async () => {
-    const file = new File(['content'], 'exam.pdf', { type: 'application/pdf' });
-    const input = fixture.nativeElement.querySelector('input[type="file"]');
-    Object.defineProperty(input, 'files', { value: [file] });
-    input.dispatchEvent(new Event('change'));
-    fixture.detectChanges();
-
-    fixture.nativeElement.querySelector('button').click();
-    await fixture.whenStable();
-    fixture.detectChanges();
-
-    const status = fixture.nativeElement.querySelector('[aria-live="polite"]');
-
-    expect(status).toBeTruthy();
-    expect(status.textContent).toContain('Pending');
-  });
-
   it('shows future study action placeholders when ingestion is done', async () => {
     const file = new File(['content'], 'exam.pdf', { type: 'application/pdf' });
-    const input = fixture.nativeElement.querySelector('input[type="file"]');
-    Object.defineProperty(input, 'files', { value: [file] });
-    input.dispatchEvent(new Event('change'));
-    fixture.detectChanges();
-
-    fixture.nativeElement.querySelector('button').click();
-    await fixture.whenStable();
-    fixture.detectChanges();
+    selectFile(fixture, file);
+    await startIngestion(fixture);
 
     await store.refreshStatus();
     await store.refreshStatus();

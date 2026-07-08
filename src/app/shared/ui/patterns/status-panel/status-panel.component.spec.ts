@@ -64,4 +64,24 @@ describe('The StatusPanelComponent', () => {
 
     expect(recovery).toBeTruthy();
   });
+
+  it('removes the live region when live is off', () => {
+    fixture.componentInstance.live = 'off';
+    fixture.detectChanges();
+
+    const panel = fixture.nativeElement.querySelector('[role="status"]');
+    const liveRegion = fixture.nativeElement.querySelector('[aria-live]');
+
+    expect(panel).toBeFalsy();
+    expect(liveRegion).toBeFalsy();
+  });
+
+  it('reflects tone through a data attribute', () => {
+    fixture.componentInstance.tone = 'success';
+    fixture.detectChanges();
+
+    const panel = fixture.nativeElement.querySelector('.status-panel');
+
+    expect(panel.getAttribute('data-tone')).toBe('success');
+  });
 });

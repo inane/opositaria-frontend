@@ -31,12 +31,25 @@
   --opo-radius-md: 0.75rem;
   --opo-radius-lg: 1rem;
 
-  /* Shadows */
-  --opo-shadow-sm: 0 1px 2px rgb(15 23 42 / 0.08);
-  --opo-shadow-md: 0 12px 32px rgb(15 23 42 / 0.12);
+  /* Transparent colour variants */
+  --opo-color-primary-alpha-8: rgb(37 99 235 / 0.08);
+  --opo-color-primary-alpha-20: rgb(37 99 235 / 0.2);
+  --opo-color-primary-alpha-28: rgb(37 99 235 / 0.28);
+  --opo-color-success-alpha-8: rgb(22 163 74 / 0.08);
+  --opo-color-success-alpha-20: rgb(22 163 74 / 0.2);
+  --opo-color-warning-alpha-8: rgb(217 119 6 / 0.08);
+  --opo-color-warning-alpha-20: rgb(217 119 6 / 0.2);
+  --opo-color-danger-alpha-8: rgb(220 38 38 / 0.08);
+  --opo-color-danger-alpha-20: rgb(220 38 38 / 0.2);
+  --opo-color-text-alpha-8: rgb(15 23 42 / 0.08);
+  --opo-color-text-alpha-12: rgb(15 23 42 / 0.12);
 
   /* Focus ring */
-  --opo-focus-ring: 0 0 0 3px rgb(37 99 235 / 0.28);
+  --opo-focus-ring: 0 0 0 3px var(--opo-color-primary-alpha-28);
+
+  /* Shadows */
+  --opo-shadow-sm: 0 1px 2px var(--opo-color-text-alpha-8);
+  --opo-shadow-md: 0 12px 32px var(--opo-color-text-alpha-12);
 
   /* Motion */
   --opo-motion-fast: 100ms;

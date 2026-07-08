@@ -11,6 +11,7 @@ import {
 } from '../../../shared/ui';
 import { SourceIngestionStore } from '../store/source-ingestion-store.service';
 import { IngestionStatus } from '../../domain/value-objects/IngestionStatus';
+import { IngestionJob } from '../../domain/entities/IngestionJob';
 
 @Component({
   selector: 'app-source-ingestion',
@@ -59,11 +60,7 @@ import { IngestionStatus } from '../../domain/value-objects/IngestionStatus';
     </opo-button>
 
     @if (store.ingestionJob(); as job) {
-      <opo-status-panel
-        [tone]="statusTone(job.status)"
-        [title]="statusTitle(job.status)"
-        [message]="statusMessage(job.status)"
-      >
+      <opo-status-panel [tone]="toneFor(job)" [title]="titleFor(job)" [message]="messageFor(job)">
         @if (job.status === ingestionStatus.ERROR) {
           <opo-button type="button" data-testid="retry-ingestion" (pressed)="onStartIngestion()">
             Try again
@@ -126,12 +123,12 @@ export class SourceIngestionComponent {
     this.store.selectSource(file);
   }
 
-  onStartIngestion(): void {
-    this.store.startIngestion();
+  async onStartIngestion(): Promise<void> {
+    await this.store.startIngestion();
   }
 
-  statusTone(status: IngestionStatus): 'neutral' | 'info' | 'success' | 'warning' | 'error' {
-    switch (status) {
+  toneFor(job: IngestionJob): 'neutral' | 'info' | 'success' | 'warning' | 'error' {
+    switch (job.status) {
       case IngestionStatus.PENDING:
         return 'neutral';
       case IngestionStatus.PROCESSING:
@@ -143,8 +140,8 @@ export class SourceIngestionComponent {
     }
   }
 
-  statusTitle(status: IngestionStatus): string {
-    switch (status) {
+  titleFor(job: IngestionJob): string {
+    switch (job.status) {
       case IngestionStatus.PENDING:
         return 'Pending';
       case IngestionStatus.PROCESSING:
@@ -156,8 +153,8 @@ export class SourceIngestionComponent {
     }
   }
 
-  statusMessage(status: IngestionStatus): string {
-    switch (status) {
+  messageFor(job: IngestionJob): string {
+    switch (job.status) {
       case IngestionStatus.PENDING:
         return 'Your source has been received and is waiting to be processed.';
       case IngestionStatus.PROCESSING:
@@ -165,7 +162,7 @@ export class SourceIngestionComponent {
       case IngestionStatus.DONE:
         return 'Your source is ready to use.';
       case IngestionStatus.ERROR:
-        return this.store.ingestionJob()?.recoveryMessage ?? 'Ingestion failed.';
+        return job.recoveryMessage ?? 'Ingestion failed.';
     }
   }
 }

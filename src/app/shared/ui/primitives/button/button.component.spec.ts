@@ -6,12 +6,18 @@ import { ButtonComponent } from './button.component';
 @Component({
   imports: [ButtonComponent],
   template: `
-    <opo-button [variant]="variant" [size]="size" [disabled]="isDisabled" (pressed)="onPressed()"
+    <opo-button
+      [type]="buttonType"
+      [variant]="variant"
+      [size]="size"
+      [disabled]="isDisabled"
+      (pressed)="onPressed()"
       >Start ingestion</opo-button
     >
   `,
 })
 class TestHostComponent {
+  buttonType: 'button' | 'submit' | 'reset' = 'button';
   variant: 'primary' | 'secondary' | 'ghost' | 'danger' = 'primary';
   size: 'sm' | 'md' | 'lg' = 'md';
   isDisabled = false;
@@ -86,5 +92,14 @@ describe('The ButtonComponent', () => {
 
     expect(host.getAttribute('data-variant')).toBe('secondary');
     expect(host.getAttribute('data-size')).toBe('lg');
+  });
+
+  it('forwards the type attribute to the native button', () => {
+    fixture.componentInstance.buttonType = 'submit';
+    fixture.detectChanges();
+
+    const button = fixture.nativeElement.querySelector('button');
+
+    expect(button.getAttribute('type')).toBe('submit');
   });
 });
