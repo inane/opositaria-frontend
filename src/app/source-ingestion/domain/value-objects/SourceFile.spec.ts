@@ -10,4 +10,10 @@ describe('The SourceFile', () => {
     expect(sourceFile.name).toBe('exam.pdf');
     expect(sourceFile.type).toBe('application/pdf');
   });
+
+  it('rejects a non-PDF file metadata', () => {
+    const file = {name: 'exam.txt', size: 1024, type: 'text/plain'};
+
+    expect(() => SourceFile.create(file)).toThrow('Only PDF files are supported');
+  });
 });
