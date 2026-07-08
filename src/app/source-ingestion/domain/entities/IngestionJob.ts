@@ -9,4 +9,8 @@ export class IngestionJob {
   static create(jobId: string): IngestionJob {
     return new IngestionJob(jobId, IngestionStatus.PENDING);
   }
+
+  startProcessing(): IngestionJob {
+    return new IngestionJob(this.jobId, IngestionStatus.PROCESSING);
+  }
 }
