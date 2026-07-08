@@ -31,10 +31,12 @@ describe('The SourceIngestionComponent', () => {
     fixture.detectChanges();
 
     const input = fixture.nativeElement.querySelector('input[type="file"]');
+    const label = fixture.nativeElement.querySelector('label');
 
     expect(input).toBeTruthy();
     expect(input.getAttribute('accept')).toBe('.pdf');
-    expect(input.getAttribute('aria-label')).toBe('Select a PDF source file');
+    expect(label).toBeTruthy();
+    expect(input.id).toBe(label.getAttribute('for'));
   });
 
   it('displays the selected PDF file name', () => {
@@ -186,12 +188,12 @@ describe('The SourceIngestionComponent', () => {
     await store.refreshStatus();
     fixture.detectChanges();
 
-    const chatAction = fixture.nativeElement.querySelector('[data-testid="action-chat"]');
-    const summaryAction = fixture.nativeElement.querySelector('[data-testid="action-summary"]');
-    const testAction = fixture.nativeElement.querySelector('[data-testid="action-test"]');
-    const planAction = fixture.nativeElement.querySelector('[data-testid="action-plan"]');
+    const chatAction = fixture.nativeElement.querySelector('[data-testid="action-chat"] button');
+    const summaryAction = fixture.nativeElement.querySelector('[data-testid="action-summary"] button');
+    const testAction = fixture.nativeElement.querySelector('[data-testid="action-test"] button');
+    const planAction = fixture.nativeElement.querySelector('[data-testid="action-plan"] button');
     const recommendationsAction = fixture.nativeElement.querySelector(
-      '[data-testid="action-recommendations"]',
+      '[data-testid="action-recommendations"] button',
     );
 
     expect(chatAction).toBeTruthy();
@@ -199,11 +201,6 @@ describe('The SourceIngestionComponent', () => {
     expect(testAction).toBeTruthy();
     expect(planAction).toBeTruthy();
     expect(recommendationsAction).toBeTruthy();
-    expect(chatAction?.getAttribute('aria-disabled')).toBe('true');
-    expect(summaryAction?.getAttribute('aria-disabled')).toBe('true');
-    expect(testAction?.getAttribute('aria-disabled')).toBe('true');
-    expect(planAction?.getAttribute('aria-disabled')).toBe('true');
-    expect(recommendationsAction?.getAttribute('aria-disabled')).toBe('true');
     expect(chatAction?.disabled).toBe(true);
     expect(summaryAction?.disabled).toBe(true);
     expect(testAction?.disabled).toBe(true);
