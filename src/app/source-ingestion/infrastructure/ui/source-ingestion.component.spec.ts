@@ -35,4 +35,14 @@ describe('The SourceIngestionComponent', () => {
     expect(input.getAttribute('accept')).toBe('.pdf');
     expect(input.getAttribute('aria-label')).toBe('Select a PDF source file');
   });
+
+  it('displays the selected PDF file name', () => {
+    const file = new File(['content'], 'exam.pdf', {type: 'application/pdf'});
+    const input = fixture.nativeElement.querySelector('input[type="file"]');
+    Object.defineProperty(input, 'files', {value: [file]});
+    input.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('exam.pdf');
+  });
 });

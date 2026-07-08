@@ -17,6 +17,10 @@ import {SourceIngestionStore} from '../store/source-ingestion-store.service';
         aria-label="Select a PDF source file"
         (change)="onFileSelected($event)"
       />
+
+      @if (store.selectedSource(); as source) {
+        <p class="selected-source">Selected: {{ source.name }}</p>
+      }
     </section>
   `,
   styleUrl: './source-ingestion.component.css',
