@@ -6,10 +6,7 @@ import { PageHeaderComponent } from './page-header.component';
 @Component({
   imports: [PageHeaderComponent],
   template: `
-    <opo-page-header
-      [title]="title"
-      [description]="description"
-    >
+    <opo-page-header [title]="title" [description]="description">
       <button type="button">Action</button>
     </opo-page-header>
   `,

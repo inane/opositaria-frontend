@@ -6,9 +6,7 @@ import { PageSectionComponent } from './page-section.component';
 @Component({
   imports: [PageSectionComponent],
   template: `
-    <opo-page-section [title]="title" [description]="description">
-      Section body
-    </opo-page-section>
+    <opo-page-section [title]="title" [description]="description"> Section body </opo-page-section>
   `,
 })
 class TestHostComponent {

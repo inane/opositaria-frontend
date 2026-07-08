@@ -6,12 +6,7 @@ import { StatusPanelComponent } from './status-panel.component';
 @Component({
   imports: [StatusPanelComponent],
   template: `
-    <opo-status-panel
-      [tone]="tone"
-      [title]="title"
-      [message]="message"
-      [live]="live"
-    >
+    <opo-status-panel [tone]="tone" [title]="title" [message]="message" [live]="live">
       <button type="button" data-testid="recovery">Retry</button>
     </opo-status-panel>
   `,

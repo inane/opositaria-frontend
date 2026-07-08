@@ -3,11 +3,7 @@ import { Component, computed, input } from '@angular/core';
 @Component({
   selector: 'opo-alert',
   template: `
-    <div
-      class="alert"
-      [attr.role]="role()"
-      [attr.data-tone]="tone()"
-    >
+    <div class="alert" [attr.role]="role()" [attr.data-tone]="tone()">
       @if (title()) {
         <strong class="alert-title">{{ title() }}</strong>
       }

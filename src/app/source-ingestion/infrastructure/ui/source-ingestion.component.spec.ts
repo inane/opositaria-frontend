@@ -172,7 +172,9 @@ describe('The SourceIngestionComponent', () => {
 
     expect(fixture.nativeElement.textContent).toContain('Error');
 
-    const retryButton = fixture.nativeElement.querySelector('[data-testid="retry-ingestion"] button');
+    const retryButton = fixture.nativeElement.querySelector(
+      '[data-testid="retry-ingestion"] button',
+    );
 
     expect(retryButton).toBeTruthy();
     expect(retryButton.textContent?.trim()).toBe('Try again');
@@ -229,7 +231,9 @@ describe('The SourceIngestionComponent', () => {
     fixture.detectChanges();
 
     const chatAction = fixture.nativeElement.querySelector('[data-testid="action-chat"] button');
-    const summaryAction = fixture.nativeElement.querySelector('[data-testid="action-summary"] button');
+    const summaryAction = fixture.nativeElement.querySelector(
+      '[data-testid="action-summary"] button',
+    );
     const testAction = fixture.nativeElement.querySelector('[data-testid="action-test"] button');
     const planAction = fixture.nativeElement.querySelector('[data-testid="action-plan"] button');
     const recommendationsAction = fixture.nativeElement.querySelector(

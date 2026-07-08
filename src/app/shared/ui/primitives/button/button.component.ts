@@ -3,12 +3,7 @@ import { Component, input, output } from '@angular/core';
 @Component({
   selector: 'opo-button',
   template: `
-    <button
-      class="button"
-      [type]="type()"
-      [disabled]="disabled()"
-      (click)="onClick()"
-    >
+    <button class="button" [type]="type()" [disabled]="disabled()" (click)="onClick()">
       <ng-content />
     </button>
   `,

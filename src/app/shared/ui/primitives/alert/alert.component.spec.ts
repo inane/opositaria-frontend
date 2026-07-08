@@ -5,11 +5,7 @@ import { AlertComponent } from './alert.component';
 
 @Component({
   imports: [AlertComponent],
-  template: `
-    <opo-alert [tone]="tone" [title]="title">
-      Something went wrong
-    </opo-alert>
-  `,
+  template: ` <opo-alert [tone]="tone" [title]="title"> Something went wrong </opo-alert> `,
 })
 class TestHostComponent {
   tone: 'info' | 'success' | 'warning' | 'error' = 'error';

@@ -6,12 +6,9 @@ import { ButtonComponent } from './button.component';
 @Component({
   imports: [ButtonComponent],
   template: `
-    <opo-button
-      [variant]="variant"
-      [size]="size"
-      [disabled]="isDisabled"
-      (pressed)="onPressed()"
-    >Start ingestion</opo-button>
+    <opo-button [variant]="variant" [size]="size" [disabled]="isDisabled" (pressed)="onPressed()"
+      >Start ingestion</opo-button
+    >
   `,
 })
 class TestHostComponent {

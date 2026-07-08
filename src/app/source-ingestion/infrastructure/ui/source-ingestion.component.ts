@@ -49,14 +49,12 @@ import { IngestionStatus } from '../../domain/value-objects/IngestionStatus';
     }
 
     @if (store.selectedSource(); as source) {
-      <p class="selected-source">Selected: <opo-badge tone="info">{{ source.name }}</opo-badge></p>
+      <p class="selected-source">
+        Selected: <opo-badge tone="info">{{ source.name }}</opo-badge>
+      </p>
     }
 
-    <opo-button
-      type="button"
-      [disabled]="!store.selectedSource()"
-      (pressed)="onStartIngestion()"
-    >
+    <opo-button type="button" [disabled]="!store.selectedSource()" (pressed)="onStartIngestion()">
       Start ingestion
     </opo-button>
 
@@ -67,11 +65,7 @@ import { IngestionStatus } from '../../domain/value-objects/IngestionStatus';
         [message]="statusMessage(job.status)"
       >
         @if (job.status === ingestionStatus.ERROR) {
-          <opo-button
-            type="button"
-            data-testid="retry-ingestion"
-            (pressed)="onStartIngestion()"
-          >
+          <opo-button type="button" data-testid="retry-ingestion" (pressed)="onStartIngestion()">
             Try again
           </opo-button>
         }
@@ -88,7 +82,12 @@ import { IngestionStatus } from '../../domain/value-objects/IngestionStatus';
               </opo-button>
             </li>
             <li>
-              <opo-button type="button" variant="ghost" [disabled]="true" data-testid="action-summary">
+              <opo-button
+                type="button"
+                variant="ghost"
+                [disabled]="true"
+                data-testid="action-summary"
+              >
                 Summaries by topic
               </opo-button>
             </li>
@@ -103,7 +102,12 @@ import { IngestionStatus } from '../../domain/value-objects/IngestionStatus';
               </opo-button>
             </li>
             <li>
-              <opo-button type="button" variant="ghost" [disabled]="true" data-testid="action-recommendations">
+              <opo-button
+                type="button"
+                variant="ghost"
+                [disabled]="true"
+                data-testid="action-recommendations"
+              >
                 Recommendations
               </opo-button>
             </li>
