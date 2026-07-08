@@ -25,4 +25,14 @@ describe('The SourceIngestionComponent', () => {
 
     expect(fixture.nativeElement.textContent).toContain('Upload your study source');
   });
+
+  it('renders an accessible PDF file selection control', () => {
+    fixture.detectChanges();
+
+    const input = fixture.nativeElement.querySelector('input[type="file"]');
+
+    expect(input).toBeTruthy();
+    expect(input.getAttribute('accept')).toBe('.pdf');
+    expect(input.getAttribute('aria-label')).toBe('Select a PDF source file');
+  });
 });
