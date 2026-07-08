@@ -1,5 +1,6 @@
 import {Component, inject} from '@angular/core';
 import {SourceIngestionStore} from '../store/source-ingestion-store.service';
+import {IngestionStatus} from '../../domain/value-objects/IngestionStatus';
 
 @Component({
   selector: 'app-source-ingestion',
@@ -29,12 +30,32 @@ import {SourceIngestionStore} from '../store/source-ingestion-store.service';
       >
         Start ingestion
       </button>
+
+      @if (store.ingestionJob(); as job) {
+        <p class="ingestion-status">
+          @switch (job.status) {
+            @case (ingestionStatus.PENDING) {
+              Pending: your source has been received and is waiting to be processed.
+            }
+            @case (ingestionStatus.PROCESSING) {
+              Processing: your source is being processed.
+            }
+            @case (ingestionStatus.DONE) {
+              Done: your source is ready to use.
+            }
+            @case (ingestionStatus.ERROR) {
+              Error: {{ job.recoveryMessage }}
+            }
+          }
+        </p>
+      }
     </section>
   `,
   styleUrl: './source-ingestion.component.css',
 })
 export class SourceIngestionComponent {
   protected readonly store = inject(SourceIngestionStore);
+  protected readonly ingestionStatus = IngestionStatus;
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;

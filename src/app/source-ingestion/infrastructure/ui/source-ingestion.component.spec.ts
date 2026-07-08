@@ -53,4 +53,18 @@ describe('The SourceIngestionComponent', () => {
 
     expect(button?.disabled).toBe(true);
   });
+
+  it('shows pending feedback after starting ingestion', async () => {
+    const file = new File(['content'], 'exam.pdf', {type: 'application/pdf'});
+    const input = fixture.nativeElement.querySelector('input[type="file"]');
+    Object.defineProperty(input, 'files', {value: [file]});
+    input.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    fixture.nativeElement.querySelector('button').click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('Pending');
+  });
 });
