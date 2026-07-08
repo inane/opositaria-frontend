@@ -1,0 +1,38 @@
+:host {
+  display: block;
+}
+
+.alert {
+  border: 1px solid transparent;
+  border-radius: var(--opo-radius-md);
+  padding: var(--opo-space-4);
+}
+
+.alert-title {
+  display: block;
+  margin-block-end: var(--opo-space-2);
+}
+
+.alert[data-tone='info'] {
+  background-color: rgb(37 99 235 / 0.08);
+  border-color: rgb(37 99 235 / 0.2);
+  color: var(--opo-color-text);
+}
+
+.alert[data-tone='success'] {
+  background-color: rgb(22 163 74 / 0.08);
+  border-color: rgb(22 163 74 / 0.2);
+  color: var(--opo-color-text);
+}
+
+.alert[data-tone='warning'] {
+  background-color: rgb(217 119 6 / 0.08);
+  border-color: rgb(217 119 6 / 0.2);
+  color: var(--opo-color-text);
+}
+
+.alert[data-tone='error'] {
+  background-color: rgb(220 38 38 / 0.08);
+  border-color: rgb(220 38 38 / 0.2);
+  color: var(--opo-color-text);
+}
