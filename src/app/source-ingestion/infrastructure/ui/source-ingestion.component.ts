@@ -45,6 +45,13 @@ import {IngestionStatus} from '../../domain/value-objects/IngestionStatus';
             }
             @case (ingestionStatus.ERROR) {
               Error: {{ job.recoveryMessage }}
+              <button
+                type="button"
+                data-testid="retry-ingestion"
+                (click)="onStartIngestion()"
+              >
+                Try again
+              </button>
             }
           }
         </p>

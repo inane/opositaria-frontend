@@ -107,4 +107,26 @@ describe('The SourceIngestionComponent', () => {
 
     expect(fixture.nativeElement.textContent).toContain('Done');
   });
+
+  it('shows error feedback with a recovery path when ingestion fails', async () => {
+    const file = new File(['content'], 'error-exam.pdf', {type: 'application/pdf'});
+    const input = fixture.nativeElement.querySelector('input[type="file"]');
+    Object.defineProperty(input, 'files', {value: [file]});
+    input.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    fixture.nativeElement.querySelector('button').click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    await store.refreshStatus();
+    await store.refreshStatus();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('Error');
+
+    const retryButton = fixture.nativeElement.querySelector('[data-testid="retry-ingestion"]');
+
+    expect(retryButton).toBeTruthy();
+  });
 });
