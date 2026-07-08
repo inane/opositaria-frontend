@@ -16,9 +16,50 @@
   min-inline-size: 2.75rem;
   padding-block: var(--opo-space-2);
   padding-inline: var(--opo-space-4);
+  transition:
+    background-color var(--opo-motion-transition-fast),
+    border-color var(--opo-motion-transition-fast),
+    box-shadow var(--opo-motion-transition-fast);
 }
 
 .button:focus-visible {
   box-shadow: var(--opo-focus-ring);
   outline: none;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+:host([data-variant='secondary']) .button {
+  background-color: var(--opo-color-surface);
+  border-color: var(--opo-color-primary);
+  color: var(--opo-color-primary);
+}
+
+:host([data-variant='ghost']) .button {
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--opo-color-primary);
+}
+
+:host([data-variant='danger']) .button {
+  background-color: var(--opo-color-danger);
+  border-color: var(--opo-color-danger);
+  color: var(--opo-color-primary-contrast);
+}
+
+:host([data-size='sm']) .button {
+  font-size: 0.875rem;
+  min-block-size: 2.25rem;
+  padding-block: var(--opo-space-1);
+  padding-inline: var(--opo-space-3);
+}
+
+:host([data-size='lg']) .button {
+  font-size: 1.125rem;
+  min-block-size: 3rem;
+  padding-block: var(--opo-space-3);
+  padding-inline: var(--opo-space-6);
 }
