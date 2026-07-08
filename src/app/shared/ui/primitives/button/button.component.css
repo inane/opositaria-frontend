@@ -1,0 +1,24 @@
+:host {
+  display: inline-block;
+}
+
+.button {
+  appearance: none;
+  background-color: var(--opo-color-primary);
+  border: 1px solid var(--opo-color-primary);
+  border-radius: var(--opo-radius-md);
+  color: var(--opo-color-primary-contrast);
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
+  min-block-size: 2.75rem;
+  min-inline-size: 2.75rem;
+  padding-block: var(--opo-space-2);
+  padding-inline: var(--opo-space-4);
+}
+
+.button:focus-visible {
+  box-shadow: var(--opo-focus-ring);
+  outline: none;
+}
