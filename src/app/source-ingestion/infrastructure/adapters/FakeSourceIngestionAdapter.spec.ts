@@ -34,4 +34,16 @@ describe('The FakeSourceIngestionAdapter', () => {
 
     expect(doneJob.status).toBe(IngestionStatus.DONE);
   });
+
+  it('simulates an error path when the source file name contains error', async () => {
+    const adapter = new FakeSourceIngestionAdapter();
+    const sourceFile = SourceFile.create({name: 'error-exam.pdf', size: 1024, type: 'application/pdf'});
+    const job = await adapter.start(sourceFile);
+    await adapter.status(job.jobId);
+
+    const failedJob = await adapter.status(job.jobId);
+
+    expect(failedJob.status).toBe(IngestionStatus.ERROR);
+    expect(failedJob.recoveryMessage).toBe('Ingestion failed. Please try again.');
+  });
 });

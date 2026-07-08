@@ -5,11 +5,13 @@ import {IngestionStatus} from '../../domain/value-objects/IngestionStatus';
 
 export class FakeSourceIngestionAdapter implements SourceIngestionGateway {
   private jobs: Map<string, IngestionJob> = new Map();
+  private sourceNames: Map<string, string> = new Map();
   private nextId = 1;
 
   async start(sourceFile: SourceFile): Promise<IngestionJob> {
     const job = IngestionJob.create(`fake-job-${this.nextId++}`);
     this.jobs.set(job.jobId, job);
+    this.sourceNames.set(job.jobId, sourceFile.name);
 
     return job;
   }
@@ -28,10 +30,13 @@ export class FakeSourceIngestionAdapter implements SourceIngestionGateway {
     }
 
     if (job.status === IngestionStatus.PROCESSING) {
-      const doneJob = job.complete();
-      this.jobs.set(jobId, doneJob);
+      const sourceName = this.sourceNames.get(jobId) ?? '';
+      const nextJob = sourceName.includes('error')
+        ? job.fail('Ingestion failed. Please try again.')
+        : job.complete();
+      this.jobs.set(jobId, nextJob);
 
-      return doneJob;
+      return nextJob;
     }
 
     return job;
