@@ -1,0 +1,59 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.dashboard-header {
+  position: relative;
+  z-index: 102;
+  flex: 0 0 auto;
+  padding: var(--opo-space-4);
+}
+
+.dashboard-footer {
+  flex: 0 0 auto;
+  padding: var(--opo-space-4);
+}
+
+.burger-menu-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding: var(--opo-space-2);
+  border: none;
+  background: transparent;
+  color: var(--opo-color-text);
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.burger-menu-button:focus-visible {
+  outline: none;
+  box-shadow: var(--opo-focus-ring);
+  border-radius: var(--opo-radius-sm);
+}
+
+.dashboard-content--grow {
+  flex: 1 1 auto;
+}
+
+.side-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: var(--opo-color-text-alpha-12);
+  z-index: 100;
+}
+
+.side-menu-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 16rem;
+  background-color: var(--opo-color-surface);
+  box-shadow: var(--opo-shadow-md);
+  z-index: 101;
+}
