@@ -148,6 +148,23 @@ describe('The SourceIngestionComponent', () => {
     expect(summaryAction).toBeNull();
   });
 
+  it('announces ingestion status for assistive technologies', async () => {
+    const file = new File(['content'], 'exam.pdf', {type: 'application/pdf'});
+    const input = fixture.nativeElement.querySelector('input[type="file"]');
+    Object.defineProperty(input, 'files', {value: [file]});
+    input.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    fixture.nativeElement.querySelector('button').click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const status = fixture.nativeElement.querySelector('[aria-live="polite"]');
+
+    expect(status).toBeTruthy();
+    expect(status.textContent).toContain('Pending');
+  });
+
   it('shows future study action placeholders when ingestion is done', async () => {
     const file = new File(['content'], 'exam.pdf', {type: 'application/pdf'});
     const input = fixture.nativeElement.querySelector('input[type="file"]');

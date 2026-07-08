@@ -32,7 +32,7 @@ import {IngestionStatus} from '../../domain/value-objects/IngestionStatus';
       </button>
 
       @if (store.ingestionJob(); as job) {
-        <p class="ingestion-status">
+        <p class="ingestion-status" aria-live="polite">
           @switch (job.status) {
             @case (ingestionStatus.PENDING) {
               Pending: your source has been received and is waiting to be processed.
