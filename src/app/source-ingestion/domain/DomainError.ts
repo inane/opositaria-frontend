@@ -4,6 +4,7 @@ export class DomainError extends Error {
     message: string,
   ) {
     super(message);
+    this.name = 'DomainError';
   }
 
   static createNotFound(message: string): DomainError {

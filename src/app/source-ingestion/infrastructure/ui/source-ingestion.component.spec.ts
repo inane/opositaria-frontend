@@ -1,10 +1,9 @@
-import {beforeEach, describe, expect, it} from 'vitest';
-import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {SourceIngestionComponent} from './source-ingestion.component';
-import {SOURCE_INGESTION_GATEWAY} from '../../application/ports/SourceIngestionGateway';
-import {FakeSourceIngestionAdapter} from '../adapters/FakeSourceIngestionAdapter';
-import {SourceIngestionStore} from '../store/source-ingestion-store.service';
-import {GetSourceIngestionStatusUseCase} from '../../application/GetSourceIngestionStatusUseCase';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { SourceIngestionComponent } from './source-ingestion.component';
+import { SOURCE_INGESTION_PORT } from '../tokens/source-ingestion-port.token';
+import { InMemorySourceIngestionRepository } from '../../domain/repositories/SourceIngestionRepository';
+import { SourceIngestionStore } from '../store/source-ingestion-store.service';
 
 describe('The SourceIngestionComponent', () => {
   let fixture: ComponentFixture<SourceIngestionComponent>;
@@ -12,10 +11,7 @@ describe('The SourceIngestionComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        {provide: SOURCE_INGESTION_GATEWAY, useClass: FakeSourceIngestionAdapter},
-        GetSourceIngestionStatusUseCase,
-      ],
+      providers: [{ provide: SOURCE_INGESTION_PORT, useClass: InMemorySourceIngestionRepository }],
     });
     fixture = TestBed.createComponent(SourceIngestionComponent);
     store = TestBed.inject(SourceIngestionStore);
@@ -42,13 +38,23 @@ describe('The SourceIngestionComponent', () => {
   });
 
   it('displays the selected PDF file name', () => {
-    const file = new File(['content'], 'exam.pdf', {type: 'application/pdf'});
+    const file = new File(['content'], 'exam.pdf', { type: 'application/pdf' });
     const input = fixture.nativeElement.querySelector('input[type="file"]');
-    Object.defineProperty(input, 'files', {value: [file]});
+    Object.defineProperty(input, 'files', { value: [file] });
     input.dispatchEvent(new Event('change'));
     fixture.detectChanges();
 
     expect(fixture.nativeElement.textContent).toContain('exam.pdf');
+  });
+
+  it('displays a validation message when a non-PDF file is selected', () => {
+    const file = new File(['content'], 'exam.txt', { type: 'text/plain' });
+    const input = fixture.nativeElement.querySelector('input[type="file"]');
+    Object.defineProperty(input, 'files', { value: [file] });
+    input.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('Only PDF files are supported');
   });
 
   it('disables the start action without a selected PDF', () => {
@@ -60,9 +66,9 @@ describe('The SourceIngestionComponent', () => {
   });
 
   it('shows pending feedback after starting ingestion', async () => {
-    const file = new File(['content'], 'exam.pdf', {type: 'application/pdf'});
+    const file = new File(['content'], 'exam.pdf', { type: 'application/pdf' });
     const input = fixture.nativeElement.querySelector('input[type="file"]');
-    Object.defineProperty(input, 'files', {value: [file]});
+    Object.defineProperty(input, 'files', { value: [file] });
     input.dispatchEvent(new Event('change'));
     fixture.detectChanges();
 
@@ -74,9 +80,9 @@ describe('The SourceIngestionComponent', () => {
   });
 
   it('updates to processing status without reloading the page', async () => {
-    const file = new File(['content'], 'exam.pdf', {type: 'application/pdf'});
+    const file = new File(['content'], 'exam.pdf', { type: 'application/pdf' });
     const input = fixture.nativeElement.querySelector('input[type="file"]');
-    Object.defineProperty(input, 'files', {value: [file]});
+    Object.defineProperty(input, 'files', { value: [file] });
     input.dispatchEvent(new Event('change'));
     fixture.detectChanges();
 
@@ -91,9 +97,9 @@ describe('The SourceIngestionComponent', () => {
   });
 
   it('shows done feedback when ingestion completes', async () => {
-    const file = new File(['content'], 'exam.pdf', {type: 'application/pdf'});
+    const file = new File(['content'], 'exam.pdf', { type: 'application/pdf' });
     const input = fixture.nativeElement.querySelector('input[type="file"]');
-    Object.defineProperty(input, 'files', {value: [file]});
+    Object.defineProperty(input, 'files', { value: [file] });
     input.dispatchEvent(new Event('change'));
     fixture.detectChanges();
 
@@ -109,9 +115,9 @@ describe('The SourceIngestionComponent', () => {
   });
 
   it('shows error feedback with a recovery path when ingestion fails', async () => {
-    const file = new File(['content'], 'error-exam.pdf', {type: 'application/pdf'});
+    const file = new File(['content'], 'error-exam.pdf', { type: 'application/pdf' });
     const input = fixture.nativeElement.querySelector('input[type="file"]');
-    Object.defineProperty(input, 'files', {value: [file]});
+    Object.defineProperty(input, 'files', { value: [file] });
     input.dispatchEvent(new Event('change'));
     fixture.detectChanges();
 
@@ -131,9 +137,9 @@ describe('The SourceIngestionComponent', () => {
   });
 
   it('does not show study actions while ingestion is pending', async () => {
-    const file = new File(['content'], 'exam.pdf', {type: 'application/pdf'});
+    const file = new File(['content'], 'exam.pdf', { type: 'application/pdf' });
     const input = fixture.nativeElement.querySelector('input[type="file"]');
-    Object.defineProperty(input, 'files', {value: [file]});
+    Object.defineProperty(input, 'files', { value: [file] });
     input.dispatchEvent(new Event('change'));
     fixture.detectChanges();
 
@@ -149,9 +155,9 @@ describe('The SourceIngestionComponent', () => {
   });
 
   it('announces ingestion status for assistive technologies', async () => {
-    const file = new File(['content'], 'exam.pdf', {type: 'application/pdf'});
+    const file = new File(['content'], 'exam.pdf', { type: 'application/pdf' });
     const input = fixture.nativeElement.querySelector('input[type="file"]');
-    Object.defineProperty(input, 'files', {value: [file]});
+    Object.defineProperty(input, 'files', { value: [file] });
     input.dispatchEvent(new Event('change'));
     fixture.detectChanges();
 
@@ -166,9 +172,9 @@ describe('The SourceIngestionComponent', () => {
   });
 
   it('shows future study action placeholders when ingestion is done', async () => {
-    const file = new File(['content'], 'exam.pdf', {type: 'application/pdf'});
+    const file = new File(['content'], 'exam.pdf', { type: 'application/pdf' });
     const input = fixture.nativeElement.querySelector('input[type="file"]');
-    Object.defineProperty(input, 'files', {value: [file]});
+    Object.defineProperty(input, 'files', { value: [file] });
     input.dispatchEvent(new Event('change'));
     fixture.detectChanges();
 
@@ -182,9 +188,26 @@ describe('The SourceIngestionComponent', () => {
 
     const chatAction = fixture.nativeElement.querySelector('[data-testid="action-chat"]');
     const summaryAction = fixture.nativeElement.querySelector('[data-testid="action-summary"]');
+    const testAction = fixture.nativeElement.querySelector('[data-testid="action-test"]');
+    const planAction = fixture.nativeElement.querySelector('[data-testid="action-plan"]');
+    const recommendationsAction = fixture.nativeElement.querySelector(
+      '[data-testid="action-recommendations"]',
+    );
 
     expect(chatAction).toBeTruthy();
     expect(summaryAction).toBeTruthy();
+    expect(testAction).toBeTruthy();
+    expect(planAction).toBeTruthy();
+    expect(recommendationsAction).toBeTruthy();
     expect(chatAction?.getAttribute('aria-disabled')).toBe('true');
+    expect(summaryAction?.getAttribute('aria-disabled')).toBe('true');
+    expect(testAction?.getAttribute('aria-disabled')).toBe('true');
+    expect(planAction?.getAttribute('aria-disabled')).toBe('true');
+    expect(recommendationsAction?.getAttribute('aria-disabled')).toBe('true');
+    expect(chatAction?.disabled).toBe(true);
+    expect(summaryAction?.disabled).toBe(true);
+    expect(testAction?.disabled).toBe(true);
+    expect(planAction?.disabled).toBe(true);
+    expect(recommendationsAction?.disabled).toBe(true);
   });
 });

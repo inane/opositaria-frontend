@@ -1,40 +1,15 @@
-import {describe, it, expect, beforeEach, afterEach} from 'vitest';
-import {TestBed} from '@angular/core/testing';
-import {SourceIngestionStore} from './source-ingestion-store.service';
-import {StartSourceIngestionUseCase} from '../../application/StartSourceIngestionUseCase';
-import {GetSourceIngestionStatusUseCase} from '../../application/GetSourceIngestionStatusUseCase';
-import {SOURCE_INGESTION_GATEWAY} from '../../application/ports/SourceIngestionGateway';
-import {IngestionJob} from '../../domain/entities/IngestionJob';
-import {IngestionStatus} from '../../domain/value-objects/IngestionStatus';
-import type {SourceIngestionGateway} from '../../application/ports/SourceIngestionGateway';
-
-class InMemorySourceIngestionGateway implements SourceIngestionGateway {
-  private jobs: Map<string, IngestionJob> = new Map();
-
-  async start(sourceFile: {name: string}): Promise<IngestionJob> {
-    const job = IngestionJob.create(`job-${sourceFile.name}`);
-    this.jobs.set(job.jobId, job);
-
-    return job;
-  }
-
-  async status(jobId: string): Promise<IngestionJob> {
-    const job = this.jobs.get(jobId);
-    if (!job) {
-      throw new Error(`Job ${jobId} not found`);
-    }
-
-    return job;
-  }
-}
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { TestBed } from '@angular/core/testing';
+import { SourceIngestionStore } from './source-ingestion-store.service';
+import { SOURCE_INGESTION_PORT } from '../tokens/source-ingestion-port.token';
+import { InMemorySourceIngestionRepository } from '../../domain/repositories/SourceIngestionRepository';
+import { IngestionStatus } from '../../domain/value-objects/IngestionStatus';
 
 describe('The SourceIngestionStore', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        {provide: SOURCE_INGESTION_GATEWAY, useClass: InMemorySourceIngestionGateway},
-        StartSourceIngestionUseCase,
-        GetSourceIngestionStatusUseCase,
+        { provide: SOURCE_INGESTION_PORT, useClass: InMemorySourceIngestionRepository },
         SourceIngestionStore,
       ],
     });
@@ -52,7 +27,7 @@ describe('The SourceIngestionStore', () => {
 
   it('accepts a selected PDF file', () => {
     const store = TestBed.inject(SourceIngestionStore);
-    const file = new File(['content'], 'exam.pdf', {type: 'application/pdf'});
+    const file = new File(['content'], 'exam.pdf', { type: 'application/pdf' });
 
     store.selectSource(file);
 
@@ -62,7 +37,7 @@ describe('The SourceIngestionStore', () => {
 
   it('rejects a selected non-PDF file and shows a validation message', () => {
     const store = TestBed.inject(SourceIngestionStore);
-    const file = new File(['content'], 'exam.txt', {type: 'text/plain'});
+    const file = new File(['content'], 'exam.txt', { type: 'text/plain' });
 
     store.selectSource(file);
 
@@ -72,11 +47,38 @@ describe('The SourceIngestionStore', () => {
 
   it('starts ingestion for the selected source and exposes the job', async () => {
     const store = TestBed.inject(SourceIngestionStore);
-    const file = new File(['content'], 'exam.pdf', {type: 'application/pdf'});
+    const file = new File(['content'], 'exam.pdf', { type: 'application/pdf' });
     store.selectSource(file);
 
     await store.startIngestion();
 
     expect(store.ingestionJob()?.status).toBe(IngestionStatus.PENDING);
+  });
+
+  it('does not start ingestion when no source is selected', async () => {
+    const store = TestBed.inject(SourceIngestionStore);
+
+    await store.startIngestion();
+
+    expect(store.ingestionJob()).toBeNull();
+  });
+
+  it('refreshes the status of an existing ingestion job', async () => {
+    const store = TestBed.inject(SourceIngestionStore);
+    const file = new File(['content'], 'exam.pdf', { type: 'application/pdf' });
+    store.selectSource(file);
+    await store.startIngestion();
+
+    await store.refreshStatus();
+
+    expect(store.ingestionJob()?.status).toBe(IngestionStatus.PROCESSING);
+  });
+
+  it('does not refresh status when no job exists', async () => {
+    const store = TestBed.inject(SourceIngestionStore);
+
+    await store.refreshStatus();
+
+    expect(store.ingestionJob()).toBeNull();
   });
 });

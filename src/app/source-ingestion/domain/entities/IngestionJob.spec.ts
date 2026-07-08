@@ -1,6 +1,6 @@
-import {describe, it, expect} from 'vitest';
-import {IngestionJob} from './IngestionJob';
-import {IngestionStatus} from '../value-objects/IngestionStatus';
+import { describe, it, expect } from 'vitest';
+import { IngestionJob } from './IngestionJob';
+import { IngestionStatus } from '../value-objects/IngestionStatus';
 
 describe('The IngestionJob', () => {
   it('creates a job with pending status', () => {

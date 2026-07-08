@@ -1,7 +1,7 @@
-import {describe, it, expect, beforeEach, afterEach} from 'vitest';
-import {TestBed} from '@angular/core/testing';
-import {provideRouter, Router} from '@angular/router';
-import {routes} from './app.routes';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { TestBed } from '@angular/core/testing';
+import { provideRouter, Router } from '@angular/router';
+import { routes } from './app.routes';
 
 describe('The application routes', () => {
   beforeEach(() => {

@@ -1,16 +1,18 @@
-import {Injectable, signal, inject} from '@angular/core';
-import {SourceFile} from '../../domain/value-objects/SourceFile';
-import {IngestionJob} from '../../domain/entities/IngestionJob';
-import {DomainError} from '../../domain/DomainError';
-import {StartSourceIngestionUseCase} from '../../application/StartSourceIngestionUseCase';
-import {GetSourceIngestionStatusUseCase} from '../../application/GetSourceIngestionStatusUseCase';
+import { Service, signal, inject } from '@angular/core';
+import { SourceFile } from '../../domain/value-objects/SourceFile';
+import { IngestionJob } from '../../domain/entities/IngestionJob';
+import { DomainError } from '../../domain/DomainError';
+import { SOURCE_INGESTION_PORT } from '../tokens/source-ingestion-port.token';
+import { StartSourceIngestionUseCase } from '../../application/StartSourceIngestionUseCase';
+import { GetSourceIngestionStatusUseCase } from '../../application/GetSourceIngestionStatusUseCase';
+import { ValidateSourceFileUseCase } from '../../application/ValidateSourceFileUseCase';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class SourceIngestionStore {
-  private readonly startIngestionUseCase = inject(StartSourceIngestionUseCase);
-  private readonly getStatusUseCase = inject(GetSourceIngestionStatusUseCase);
+  private readonly port = inject(SOURCE_INGESTION_PORT);
+  private readonly startIngestionUseCase = new StartSourceIngestionUseCase(this.port);
+  private readonly getStatusUseCase = new GetSourceIngestionStatusUseCase(this.port);
+  private readonly validateSourceFileUseCase = new ValidateSourceFileUseCase();
   private readonly source = signal<SourceFile | null>(null);
   private readonly job = signal<IngestionJob | null>(null);
   private readonly validation = signal<string>('');
@@ -21,7 +23,11 @@ export class SourceIngestionStore {
 
   selectSource(file: File): void {
     try {
-      const sourceFile = SourceFile.create({name: file.name, size: file.size, type: file.type});
+      const sourceFile = this.validateSourceFileUseCase.execute({
+        name: file.name,
+        size: file.size,
+        type: file.type,
+      });
       this.source.set(sourceFile);
       this.validation.set('');
     } catch (error) {
@@ -42,11 +48,7 @@ export class SourceIngestionStore {
       return;
     }
 
-    const job = await this.startIngestionUseCase.execute({
-      name: selectedSource.name,
-      size: selectedSource.size,
-      type: selectedSource.type,
-    });
+    const job = await this.startIngestionUseCase.execute(selectedSource);
     this.job.set(job);
   }
 

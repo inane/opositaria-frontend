@@ -1,10 +1,10 @@
-import {IngestionStatus} from '../value-objects/IngestionStatus';
+import { IngestionStatus } from '../value-objects/IngestionStatus';
 
 export class IngestionJob {
   private constructor(
     readonly jobId: string,
     readonly status: IngestionStatus,
-    readonly recoveryMessage: string = '',
+    readonly recoveryMessage = '',
   ) {}
 
   static create(jobId: string): IngestionJob {

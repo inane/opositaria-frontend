@@ -1,4 +1,4 @@
-import {DomainError} from '../DomainError';
+import { DomainError } from '../DomainError';
 
 export class SourceFile {
   private constructor(
@@ -7,7 +7,7 @@ export class SourceFile {
     readonly type: string,
   ) {}
 
-  static create(file: {name: string; size: number; type: string}): SourceFile {
+  static create(file: { name: string; size: number; type: string }): SourceFile {
     if (file.type !== 'application/pdf') {
       throw DomainError.createValidation('Only PDF files are supported');
     }
