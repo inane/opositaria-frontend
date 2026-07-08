@@ -27,6 +27,14 @@ describe('The SourceIngestionComponent', () => {
     expect(fixture.nativeElement.textContent).toContain('Upload your study source');
   });
 
+  it('gives the primary action an accessible name', () => {
+    fixture.detectChanges();
+
+    const button = fixture.nativeElement.querySelector('opo-button button');
+
+    expect(button?.textContent?.trim()).toBe('Start ingestion');
+  });
+
   it('renders an accessible PDF file selection control', () => {
     fixture.detectChanges();
 
@@ -59,6 +67,19 @@ describe('The SourceIngestionComponent', () => {
     expect(fixture.nativeElement.textContent).toContain('Only PDF files are supported');
   });
 
+  it('announces validation feedback through an alert region', () => {
+    const file = new File(['content'], 'exam.txt', { type: 'text/plain' });
+    const input = fixture.nativeElement.querySelector('input[type="file"]');
+    Object.defineProperty(input, 'files', { value: [file] });
+    input.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    const alert = fixture.nativeElement.querySelector('[role="alert"]');
+
+    expect(alert).toBeTruthy();
+    expect(alert.textContent).toContain('Only PDF files are supported');
+  });
+
   it('disables the start action without a selected PDF', () => {
     fixture.detectChanges();
 
@@ -79,6 +100,24 @@ describe('The SourceIngestionComponent', () => {
     fixture.detectChanges();
 
     expect(fixture.nativeElement.textContent).toContain('Pending');
+  });
+
+  it('announces ingestion status through a polite live region', async () => {
+    const file = new File(['content'], 'exam.pdf', { type: 'application/pdf' });
+    const input = fixture.nativeElement.querySelector('input[type="file"]');
+    Object.defineProperty(input, 'files', { value: [file] });
+    input.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    fixture.nativeElement.querySelector('button').click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const status = fixture.nativeElement.querySelector('[role="status"]');
+
+    expect(status).toBeTruthy();
+    expect(status.getAttribute('aria-live')).toBe('polite');
+    expect(status.textContent).toContain('Pending');
   });
 
   it('updates to processing status without reloading the page', async () => {
@@ -133,9 +172,10 @@ describe('The SourceIngestionComponent', () => {
 
     expect(fixture.nativeElement.textContent).toContain('Error');
 
-    const retryButton = fixture.nativeElement.querySelector('[data-testid="retry-ingestion"]');
+    const retryButton = fixture.nativeElement.querySelector('[data-testid="retry-ingestion"] button');
 
     expect(retryButton).toBeTruthy();
+    expect(retryButton.textContent?.trim()).toBe('Try again');
   });
 
   it('does not show study actions while ingestion is pending', async () => {
