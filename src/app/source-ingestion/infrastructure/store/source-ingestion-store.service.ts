@@ -3,12 +3,14 @@ import {SourceFile} from '../../domain/value-objects/SourceFile';
 import {IngestionJob} from '../../domain/entities/IngestionJob';
 import {DomainError} from '../../domain/DomainError';
 import {StartSourceIngestionUseCase} from '../../application/StartSourceIngestionUseCase';
+import {GetSourceIngestionStatusUseCase} from '../../application/GetSourceIngestionStatusUseCase';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SourceIngestionStore {
   private readonly startIngestionUseCase = inject(StartSourceIngestionUseCase);
+  private readonly getStatusUseCase = inject(GetSourceIngestionStatusUseCase);
   private readonly source = signal<SourceFile | null>(null);
   private readonly job = signal<IngestionJob | null>(null);
   private readonly validation = signal<string>('');
@@ -45,6 +47,16 @@ export class SourceIngestionStore {
       size: selectedSource.size,
       type: selectedSource.type,
     });
+    this.job.set(job);
+  }
+
+  async refreshStatus(): Promise<void> {
+    const currentJob = this.job();
+    if (!currentJob) {
+      return;
+    }
+
+    const job = await this.getStatusUseCase.execute(currentJob.jobId);
     this.job.set(job);
   }
 }

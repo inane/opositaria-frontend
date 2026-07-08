@@ -2,6 +2,7 @@ import {describe, it, expect, beforeEach, afterEach} from 'vitest';
 import {TestBed} from '@angular/core/testing';
 import {SourceIngestionStore} from './source-ingestion-store.service';
 import {StartSourceIngestionUseCase} from '../../application/StartSourceIngestionUseCase';
+import {GetSourceIngestionStatusUseCase} from '../../application/GetSourceIngestionStatusUseCase';
 import {SOURCE_INGESTION_GATEWAY} from '../../application/ports/SourceIngestionGateway';
 import {IngestionJob} from '../../domain/entities/IngestionJob';
 import {IngestionStatus} from '../../domain/value-objects/IngestionStatus';
@@ -33,6 +34,7 @@ describe('The SourceIngestionStore', () => {
       providers: [
         {provide: SOURCE_INGESTION_GATEWAY, useClass: InMemorySourceIngestionGateway},
         StartSourceIngestionUseCase,
+        GetSourceIngestionStatusUseCase,
         SourceIngestionStore,
       ],
     });
