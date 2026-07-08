@@ -16,4 +16,14 @@ describe('The SourceIngestionStore', () => {
 
     expect(store.selectedSource()).toBeNull();
   });
+
+  it('accepts a selected PDF file', () => {
+    const store = TestBed.inject(SourceIngestionStore);
+    const file = new File(['content'], 'exam.pdf', {type: 'application/pdf'});
+
+    store.selectSource(file);
+
+    expect(store.selectedSource()?.name).toBe('exam.pdf');
+    expect(store.validationMessage()).toBe('');
+  });
 });
