@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SourceIngestionComponent } from './source-ingestion.component';
 import { SOURCE_INGESTION_PORT } from '../tokens/source-ingestion-port.token';

@@ -5,6 +5,7 @@
 /tmp
 /out-tsc
 /bazel-out
+/docs
 
 # Node
 /node_modules
@@ -14,20 +15,25 @@ yarn-error.log
 # IDEs and editors
 .idea/
 .project
+.husky
 .classpath
 .c9/
 *.launch
 .settings/
 *.sublime-workspace
 
-# Visual Studio Code
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-!.vscode/mcp.json
-.history/*
+# IA
+.claude
+CLAUDE.md
+AGENTS.md
+RALPH.md
+LOOP.md
+ralph.sh
+ralph-once.sh
+
+# SDD
+openspec
+.opencode
 
 # Miscellaneous
 /.angular/cache
@@ -42,3 +48,12 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Secret files
+.env
+
+# Playwright
+.playwright-mcp
+/test-results/
+/playwright-report/
+/playwright/.cache/

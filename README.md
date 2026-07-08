@@ -1,59 +1,89 @@
-# OpositariaFrontend
+# Opositaría Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.0.5.
+Opositaría es un producto en fase inicial orientado a ayudar a personas que preparan oposiciones a vincular, organizar y trabajar con fuentes de información relacionadas con su temario.
 
-## Development server
+La primera aproximación del MVP plantea una experiencia similar a un clon focalizado de NotebookLM para oposiciones: permitir que la persona usuaria incorpore manualmente fuentes de información, inicialmente mediante la subida de archivos PDF, para poder construir una base de conocimiento útil alrededor de su oposición.
 
-To start a local development server, run:
+## Propósito Del Proyecto
+
+El objetivo del proyecto es crear una herramienta que ayude a preparar oposiciones con foco en tres ejes principales:
+
+- Metodología: apoyar una forma de estudio estructurada, progresiva y accionable.
+- UX: cuidar la experiencia para que trabajar con temarios extensos, documentos y sesiones de estudio sea claro y fluido.
+- Métricas: medir progreso, actividad, cobertura y resultados para convertir el estudio en un proceso observable.
+
+La inteligencia artificial será una pieza importante del producto, pero no como una capa genérica, sino como una ayuda integrada en flujos concretos: análisis de fuentes, asistencia al estudio, generación de materiales, recuperación de información y seguimiento inteligente del avance.
+
+## Enfoque De Desarrollo
+
+Este documento es vivo y representa una primera iteración del MVP. La dirección del producto se irá refinando a medida que se validen necesidades, flujos y funcionalidades.
+
+El desarrollo se hará de forma incremental, generando funcionalidades poco a poco mediante OpenSpec y SSD, para mantener una relación clara entre intención de producto, especificación, implementación y validación.
+
+## Estado Actual
+
+El proyecto está todavía cerca de la plantilla inicial de Angular. Las funcionalidades principales se irán incorporando progresivamente a partir de cambios especificados.
+
+## Flujo Funcional Del Frontend
+
+El frontend Angular v22 es la capa desde la que la persona usuaria interactúa con el sistema: sube documentos, consulta el estado de procesamiento y accede a las funcionalidades de estudio cuando las fuentes están listas.
+
+![Flujo del sistema Opositaria](docs/workflow.png)
+
+Desde el punto de vista del frontend, el flujo inicial del MVP será:
+
+- La persona usuaria sube un documento, inicialmente PDF.
+- La aplicación envía el archivo a la API.
+- La API responde rápidamente con un identificador de trabajo.
+- La UI muestra el estado de ingesta sin bloquear la pantalla.
+- El estado se actualizará mediante polling, WebSocket o SSE.
+- Cuando el documento esté listo, se habilitarán funcionalidades de estudio sobre esa fuente.
+
+Estados relevantes para la interfaz:
+
+- `PENDING`: el documento ha sido recibido y está pendiente de procesamiento.
+- `PROCESSING`: el sistema está extrayendo, limpiando, fragmentando e indexando el contenido.
+- `DONE`: la fuente está lista para ser usada.
+- `ERROR`: ha ocurrido un problema durante la ingesta.
+
+El frontend no procesa PDFs, no genera embeddings y no indexa información. Su foco es ofrecer una experiencia clara, trazable y accionable sobre el estado del sistema.
+
+Responsabilidades principales del frontend:
+
+- Subida manual de fuentes de información.
+- Feedback visual del estado de ingesta.
+- Gestión de errores comprensible para la persona usuaria.
+- Acceso al chat cuando la fuente esté lista.
+- Visualización de respuestas con fuentes.
+- Presentación de resúmenes, tests, planes y recomendaciones.
+- Métricas de progreso y actividad cuando el producto avance.
+
+## Desarrollo Local
+
+Instala las dependencias con:
 
 ```bash
-ng serve
+npm install
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+Arranca el servidor de desarrollo con:
 
 ```bash
-ng generate component component-name
+npm start
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+La aplicación estará disponible en `http://localhost:4200/`.
+
+## Build Y Tests
+
+Para generar una build de producción:
 
 ```bash
-ng generate --help
+npm run build
 ```
 
-## Building
-
-To build the project run:
+Para ejecutar los tests unitarios:
 
 ```bash
-ng build
+npm run test
 ```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
