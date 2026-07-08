@@ -13,4 +13,8 @@ export class IngestionJob {
   startProcessing(): IngestionJob {
     return new IngestionJob(this.jobId, IngestionStatus.PROCESSING);
   }
+
+  complete(): IngestionJob {
+    return new IngestionJob(this.jobId, IngestionStatus.DONE);
+  }
 }

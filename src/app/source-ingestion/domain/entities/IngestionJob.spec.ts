@@ -17,4 +17,12 @@ describe('The IngestionJob', () => {
 
     expect(processingJob.status).toBe(IngestionStatus.PROCESSING);
   });
+
+  it('completes a processing job', () => {
+    const job = IngestionJob.create('job-1').startProcessing();
+
+    const doneJob = job.complete();
+
+    expect(doneJob.status).toBe(IngestionStatus.DONE);
+  });
 });
