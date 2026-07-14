@@ -1,6 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { DashboardSideNavigationComponent } from './side-navigation/dashboard-side-navigation.component';
+import { SideNavigationComponent } from './side-navigation/side-navigation.component';
 
 @Component({
   selector: 'app-dashboard-shell',
@@ -9,7 +9,7 @@ import { DashboardSideNavigationComponent } from './side-navigation/dashboard-si
     '(document:click)': 'closeSideMenuOnBackdropClick($event)',
     '(document:keydown.escape)': 'closeSideMenuOnEscape()',
   },
-  imports: [RouterOutlet, DashboardSideNavigationComponent],
+  imports: [RouterOutlet, SideNavigationComponent],
   template: `
     <header class="dashboard-header">
       <button

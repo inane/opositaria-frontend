@@ -9,7 +9,7 @@ interface NavigationItem {
 @Component({
   selector: 'app-dashboard-side-navigation',
   imports: [RouterLink],
-  styleUrl: './dashboard-side-navigation.component.css',
+  styleUrl: './side-navigation.component.css',
   template: `
     <nav
       class="side-navigation"
@@ -34,7 +34,7 @@ interface NavigationItem {
     </nav>
   `,
 })
-export class DashboardSideNavigationComponent {
+export class SideNavigationComponent {
   readonly isOpen = input(false);
   readonly itemSelected = output<void>();
 
