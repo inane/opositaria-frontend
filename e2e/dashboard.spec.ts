@@ -10,7 +10,8 @@ test.describe('The dashboard home shell', () => {
     await expect(page.getByRole('contentinfo')).toBeVisible();
   });
 
-  test('opens and closes the side menu with the burger button', async ({ page }) => {
+  test('opens and closes the mobile side menu with the burger button', async ({ page }) => {
+    await page.setViewportSize({ width: 800, height: 720 });
     await page.goto('/dashboard');
     const menuButton = page.getByRole('button', { name: 'Open menu' });
     const sideMenu = page.getByRole('navigation', { name: 'Side menu' });
@@ -23,7 +24,8 @@ test.describe('The dashboard home shell', () => {
     await expect(sideMenu).not.toBeVisible();
   });
 
-  test('closes the side menu by clicking outside the panel', async ({ page }) => {
+  test('closes the mobile side menu by clicking outside the panel', async ({ page }) => {
+    await page.setViewportSize({ width: 800, height: 720 });
     await page.goto('/dashboard');
     const sideMenu = page.getByRole('navigation', { name: 'Side menu' });
 
@@ -32,6 +34,27 @@ test.describe('The dashboard home shell', () => {
     await page.locator('.side-menu-backdrop').click();
 
     await expect(sideMenu).not.toBeVisible();
+  });
+
+  test('expands and collapses the desktop navigation rail with the burger button', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.goto('/dashboard');
+    const sideMenu = page.getByRole('navigation', { name: 'Side menu' });
+    const menuButton = page.getByRole('button', { name: 'Open menu' });
+    const visualLabel = page.locator('.side-navigation-label');
+
+    await expect(sideMenu).toBeVisible();
+    await expect(visualLabel).not.toBeVisible();
+
+    await menuButton.click();
+
+    await expect(page.getByRole('button', { name: 'Close menu' })).toBeVisible();
+    await expect(visualLabel).toBeVisible();
+
+    await page.getByRole('button', { name: 'Close menu' }).click();
+
+    await expect(page.getByRole('button', { name: 'Open menu' })).toBeVisible();
+    await expect(visualLabel).not.toBeVisible();
   });
 
   test('displays the source ingestion upload experience on the dashboard', async ({ page }) => {

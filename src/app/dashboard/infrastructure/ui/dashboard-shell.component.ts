@@ -1,5 +1,10 @@
 import { Component, ElementRef, inject, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterLink, RouterOutlet } from '@angular/router';
+
+interface NavigationItem {
+  label: string;
+  path: string;
+}
 
 @Component({
   selector: 'app-dashboard-shell',
@@ -8,7 +13,7 @@ import { RouterOutlet } from '@angular/router';
     '(document:click)': 'closeSideMenuOnOutsideClick($event)',
     '(document:keydown.escape)': 'closeSideMenuOnEscape()',
   },
-  imports: [RouterOutlet],
+  imports: [RouterLink, RouterOutlet],
   template: `
     <header class="dashboard-header">
       <button
@@ -16,23 +21,45 @@ import { RouterOutlet } from '@angular/router';
         type="button"
         [attr.aria-label]="isSideMenuOpen() ? 'Close menu' : 'Open menu'"
         [attr.aria-expanded]="isSideMenuOpen()"
-        [attr.aria-controls]="isSideMenuOpen() ? 'side-menu' : null"
+        aria-controls="side-menu"
         (click)="toggleSideMenu()"
       >
         <span class="burger-menu-icon" aria-hidden="true">☰</span>
       </button>
     </header>
 
-    <main class="dashboard-content dashboard-content--grow">
-      <router-outlet />
-    </main>
+    <div class="dashboard-body">
+      <nav
+        class="side-navigation"
+        [class.side-navigation--collapsed]="!isSideMenuOpen()"
+        [class.side-navigation--rail]="!isSideMenuOpen()"
+        role="navigation"
+        aria-label="Side menu"
+        id="side-menu"
+      >
+        @for (item of navigationItems; track item.label) {
+          <a
+            class="side-navigation-item"
+            [routerLink]="item.path"
+            [attr.aria-label]="item.label"
+            aria-current="page"
+            (click)="closeSideMenu()"
+          >
+            <span class="side-navigation-icon" aria-hidden="true">⌂</span>
+            <span class="side-navigation-label">{{ item.label }}</span>
+          </a>
+        }
+      </nav>
+
+      <main class="dashboard-content dashboard-content--grow">
+        <router-outlet />
+      </main>
+    </div>
+
     <footer class="dashboard-footer"></footer>
 
     @if (isSideMenuOpen()) {
       <div class="side-menu-backdrop"></div>
-      <aside class="side-menu-panel" role="navigation" aria-label="Side menu" id="side-menu">
-        <span class="side-menu-item">Inicio</span>
-      </aside>
     }
   `,
   styleUrl: './dashboard-shell.component.css',
@@ -40,6 +67,13 @@ import { RouterOutlet } from '@angular/router';
 export class DashboardShellComponent {
   private readonly elementRef = inject(ElementRef<HTMLElement>);
   protected readonly isSideMenuOpen = signal(false);
+  protected readonly navigationItems: NavigationItem[] = [
+    { label: 'Inicio', path: '/dashboard' },
+  ];
+
+  protected closeSideMenu(): void {
+    this.isSideMenuOpen.set(false);
+  }
 
   protected toggleSideMenu(): void {
     this.isSideMenuOpen.set(!this.isSideMenuOpen());
@@ -47,21 +81,21 @@ export class DashboardShellComponent {
 
   protected closeSideMenuOnOutsideClick(event: MouseEvent): void {
     const eventTarget = event.target;
-    const panel = this.elementRef.nativeElement.querySelector('.side-menu-panel');
+    const nav = this.elementRef.nativeElement.querySelector('.side-navigation');
     const menuButton = this.elementRef.nativeElement.querySelector('.burger-menu-button');
     if (
       !(eventTarget instanceof Node) ||
-      !panel ||
+      !nav ||
       !menuButton ||
-      panel.contains(eventTarget) ||
+      nav.contains(eventTarget) ||
       menuButton.contains(eventTarget)
     ) {
       return;
     }
-    this.isSideMenuOpen.set(false);
+    this.closeSideMenu();
   }
 
   protected closeSideMenuOnEscape(): void {
-    this.isSideMenuOpen.set(false);
+    this.closeSideMenu();
   }
 }
