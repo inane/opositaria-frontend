@@ -201,6 +201,23 @@ describe('The Dashboard Shell', () => {
     expect(nav.classList.contains('side-navigation--collapsed')).toBe(false);
   });
 
+  it('keeps expanded desktop navigation open when clicking the main content', () => {
+    fixture.detectChanges();
+
+    const button = fixture.nativeElement.querySelector('.burger-menu-button') as HTMLButtonElement;
+
+    button.click();
+    fixture.detectChanges();
+
+    const nav = fixture.nativeElement.querySelector('.side-navigation') as HTMLElement;
+    const main = fixture.nativeElement.querySelector('main') as HTMLElement;
+
+    main.click();
+    fixture.detectChanges();
+
+    expect(nav.classList.contains('side-navigation--collapsed')).toBe(false);
+  });
+
   it('closes the side navigation when clicking the backdrop', () => {
     fixture.detectChanges();
 

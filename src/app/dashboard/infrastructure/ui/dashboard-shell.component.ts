@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { DashboardSideNavigationComponent } from './side-navigation/dashboard-side-navigation.component';
 
@@ -6,7 +6,7 @@ import { DashboardSideNavigationComponent } from './side-navigation/dashboard-si
   selector: 'app-dashboard-shell',
   host: {
     class: 'dashboard-shell',
-    '(document:click)': 'closeSideMenuOnOutsideClick($event)',
+    '(document:click)': 'closeSideMenuOnBackdropClick($event)',
     '(document:keydown.escape)': 'closeSideMenuOnEscape()',
   },
   imports: [RouterOutlet, DashboardSideNavigationComponent],
@@ -44,7 +44,6 @@ import { DashboardSideNavigationComponent } from './side-navigation/dashboard-si
   styleUrl: './dashboard-shell.component.css',
 })
 export class DashboardShellComponent {
-  private readonly elementRef = inject(ElementRef<HTMLElement>);
   protected readonly isSideMenuOpen = signal(false);
 
   protected closeSideMenu(): void {
@@ -55,19 +54,13 @@ export class DashboardShellComponent {
     this.isSideMenuOpen.set(!this.isSideMenuOpen());
   }
 
-  protected closeSideMenuOnOutsideClick(event: MouseEvent): void {
+  protected closeSideMenuOnBackdropClick(event: MouseEvent): void {
     const eventTarget = event.target;
-    const nav = this.elementRef.nativeElement.querySelector('.side-navigation');
-    const menuButton = this.elementRef.nativeElement.querySelector('.burger-menu-button');
-    if (
-      !(eventTarget instanceof Node) ||
-      !nav ||
-      !menuButton ||
-      nav.contains(eventTarget) ||
-      menuButton.contains(eventTarget)
-    ) {
+
+    if (!(eventTarget instanceof Element) || !eventTarget.classList.contains('side-menu-backdrop')) {
       return;
     }
+
     this.closeSideMenu();
   }
 
