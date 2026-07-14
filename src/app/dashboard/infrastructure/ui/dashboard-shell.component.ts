@@ -30,7 +30,7 @@ interface NavigationItem {
     </header>
 
     <div class="dashboard-body">
-      <app-dashboard-side-navigation />
+      <app-dashboard-side-navigation [isOpen]="isSideMenuOpen()" />
       <nav
         class="side-navigation"
         [class.side-navigation--collapsed]="!isSideMenuOpen()"

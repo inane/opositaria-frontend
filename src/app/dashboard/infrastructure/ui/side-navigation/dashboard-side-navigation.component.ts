@@ -1,7 +1,16 @@
-import { Component } from '@angular/core';
+import { Component, input } from '@angular/core';
 
 @Component({
   selector: 'app-dashboard-side-navigation',
-  template: ``,
+  template: `
+    <nav
+      class="side-navigation"
+      [class.side-navigation--collapsed]="!isOpen()"
+      [class.side-navigation--rail]="!isOpen()"
+    >
+    </nav>
+  `,
 })
-export class DashboardSideNavigationComponent {}
+export class DashboardSideNavigationComponent {
+  readonly isOpen = input(false);
+}
