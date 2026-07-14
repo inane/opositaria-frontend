@@ -1,5 +1,6 @@
 import { Component, ElementRef, inject, signal } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
+import { DashboardSideNavigationComponent } from './side-navigation/dashboard-side-navigation.component';
 
 interface NavigationItem {
   label: string;
@@ -13,7 +14,7 @@ interface NavigationItem {
     '(document:click)': 'closeSideMenuOnOutsideClick($event)',
     '(document:keydown.escape)': 'closeSideMenuOnEscape()',
   },
-  imports: [RouterLink, RouterOutlet],
+  imports: [RouterLink, RouterOutlet, DashboardSideNavigationComponent],
   template: `
     <header class="dashboard-header">
       <button
@@ -29,6 +30,7 @@ interface NavigationItem {
     </header>
 
     <div class="dashboard-body">
+      <app-dashboard-side-navigation />
       <nav
         class="side-navigation"
         [class.side-navigation--collapsed]="!isSideMenuOpen()"

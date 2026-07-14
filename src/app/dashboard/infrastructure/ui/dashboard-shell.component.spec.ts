@@ -89,6 +89,19 @@ describe('The Dashboard Shell', () => {
     expect(button.getAttribute('aria-expanded')).toBe('true');
   });
 
+  it('renders a dedicated dashboard side navigation component while preserving the shell layout', () => {
+    fixture.detectChanges();
+
+    const root = fixture.nativeElement as HTMLElement;
+
+    const sideNav = root.querySelector('app-dashboard-side-navigation');
+
+    expect(sideNav).toBeTruthy();
+    expect(root.querySelector('header')).toBeTruthy();
+    expect(root.querySelector('main')).toBeTruthy();
+    expect(root.querySelector('footer')).toBeTruthy();
+  });
+
   it('points the menu button to the single side navigation target', () => {
     fixture.detectChanges();
 
