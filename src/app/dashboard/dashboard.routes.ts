@@ -1,10 +1,10 @@
 import { Routes } from '@angular/router';
-import { DashboardShellComponent } from './infrastructure/ui/dashboard-shell.component';
+import { DashboardComponent } from './infrastructure/ui/dashboard-component';
 
 export const dashboardRoutes: Routes = [
   {
     path: '',
-    component: DashboardShellComponent,
+    component: DashboardComponent,
     children: [
       {
         path: '',

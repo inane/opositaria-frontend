@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { dashboardRoutes } from './dashboard.routes';
-import { DashboardShellComponent } from './infrastructure/ui/dashboard-shell.component';
+import { DashboardComponent } from './infrastructure/ui/dashboard-component';
 
 describe('The dashboard routes', () => {
   it('renders the dashboard shell as the dashboard home', () => {
     const homeRoute = dashboardRoutes[0];
 
     expect(homeRoute.path).toBe('');
-    expect(homeRoute.component).toBe(DashboardShellComponent);
+    expect(homeRoute.component).toBe(DashboardComponent);
   });
 
   it('loads source ingestion inside the dashboard home', async () => {

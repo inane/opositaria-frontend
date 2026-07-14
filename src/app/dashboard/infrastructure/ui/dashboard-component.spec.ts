@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { DashboardShellComponent } from './dashboard-shell.component';
+import { DashboardComponent } from './dashboard-component';
 
 describe('The Dashboard Shell', () => {
-  let fixture: ComponentFixture<DashboardShellComponent>;
+  let fixture: ComponentFixture<DashboardComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -12,7 +12,7 @@ describe('The Dashboard Shell', () => {
         provideRouter([{ path: '**', children: [] }]),
       ],
     });
-    fixture = TestBed.createComponent(DashboardShellComponent);
+    fixture = TestBed.createComponent(DashboardComponent);
   });
 
   afterEach(() => {

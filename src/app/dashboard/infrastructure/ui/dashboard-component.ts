@@ -41,9 +41,9 @@ import { DashboardSideNavigationComponent } from './side-navigation/dashboard-si
       <div class="side-menu-backdrop"></div>
     }
   `,
-  styleUrl: './dashboard-shell.component.css',
+  styleUrl: './dashboard-component.css',
 })
-export class DashboardShellComponent {
+export class DashboardComponent {
   protected readonly isSideMenuOpen = signal(false);
 
   protected closeSideMenu(): void {
