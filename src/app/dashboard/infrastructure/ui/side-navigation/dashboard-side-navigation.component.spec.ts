@@ -1,12 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { DashboardSideNavigationComponent } from './dashboard-side-navigation.component';
 
 describe('The Dashboard Side Navigation', () => {
   let fixture: ComponentFixture<DashboardSideNavigationComponent>;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      providers: [provideRouter([{ path: '**', children: [] }])],
+    });
     fixture = TestBed.createComponent(DashboardSideNavigationComponent);
   });
 

@@ -1,11 +1,6 @@
 import { Component, ElementRef, inject, signal } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
 import { DashboardSideNavigationComponent } from './side-navigation/dashboard-side-navigation.component';
-
-interface NavigationItem {
-  label: string;
-  path: string;
-}
 
 @Component({
   selector: 'app-dashboard-shell',
@@ -14,7 +9,7 @@ interface NavigationItem {
     '(document:click)': 'closeSideMenuOnOutsideClick($event)',
     '(document:keydown.escape)': 'closeSideMenuOnEscape()',
   },
-  imports: [RouterLink, RouterOutlet, DashboardSideNavigationComponent],
+  imports: [RouterOutlet, DashboardSideNavigationComponent],
   template: `
     <header class="dashboard-header">
       <button
@@ -30,28 +25,10 @@ interface NavigationItem {
     </header>
 
     <div class="dashboard-body">
-      <app-dashboard-side-navigation [isOpen]="isSideMenuOpen()" />
-      <nav
-        class="side-navigation"
-        [class.side-navigation--collapsed]="!isSideMenuOpen()"
-        [class.side-navigation--rail]="!isSideMenuOpen()"
-        role="navigation"
-        aria-label="Side menu"
-        id="side-menu"
-      >
-        @for (item of navigationItems; track item.label) {
-          <a
-            class="side-navigation-item"
-            [routerLink]="item.path"
-            [attr.aria-label]="item.label"
-            aria-current="page"
-            (click)="closeSideMenu()"
-          >
-            <span class="side-navigation-icon" aria-hidden="true">⌂</span>
-            <span class="side-navigation-label">{{ item.label }}</span>
-          </a>
-        }
-      </nav>
+      <app-dashboard-side-navigation
+        [isOpen]="isSideMenuOpen()"
+        (itemSelected)="closeSideMenu()"
+      />
 
       <main class="dashboard-content dashboard-content--grow">
         <router-outlet />
@@ -69,9 +46,6 @@ interface NavigationItem {
 export class DashboardShellComponent {
   private readonly elementRef = inject(ElementRef<HTMLElement>);
   protected readonly isSideMenuOpen = signal(false);
-  protected readonly navigationItems: NavigationItem[] = [
-    { label: 'Inicio', path: '/dashboard' },
-  ];
 
   protected closeSideMenu(): void {
     this.isSideMenuOpen.set(false);
