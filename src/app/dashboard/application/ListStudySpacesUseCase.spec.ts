@@ -3,20 +3,19 @@ import { ListStudySpacesUseCase } from './ListStudySpacesUseCase';
 import { InMemoryStudySpaceRepository } from '../domain/repositories/StudySpaceRepository';
 import { StudySpace } from '../domain/entities/StudySpace';
 
+function createSpace(title: string, overrides: Partial<{ isOwned: boolean; isFeatured: boolean; sourceCount: number }> = {}): StudySpace {
+  return StudySpace.create({
+    title,
+    isOwned: overrides.isOwned ?? false,
+    isFeatured: overrides.isFeatured ?? false,
+    sourceCount: overrides.sourceCount ?? 0,
+  });
+}
+
 describe('The ListStudySpacesUseCase', () => {
   it('lists all study spaces from the repository', async () => {
-    const space1 = StudySpace.create({
-      title: 'Algebraic Structures',
-      isOwned: true,
-      isFeatured: false,
-      sourceCount: 3,
-    });
-    const space2 = StudySpace.create({
-      title: 'Calculus Basics',
-      isOwned: false,
-      isFeatured: true,
-      sourceCount: 5,
-    });
+    const space1 = createSpace('Algebraic Structures', { isOwned: true, sourceCount: 3 });
+    const space2 = createSpace('Calculus Basics', { isFeatured: true, sourceCount: 5 });
     const repository = new InMemoryStudySpaceRepository([space1, space2]);
     const useCase = new ListStudySpacesUseCase(repository);
 
@@ -28,18 +27,8 @@ describe('The ListStudySpacesUseCase', () => {
   });
 
   it('lists only featured study spaces when the featured filter is active', async () => {
-    const owned = StudySpace.create({
-      title: 'My Space',
-      isOwned: true,
-      isFeatured: false,
-      sourceCount: 2,
-    });
-    const featured = StudySpace.create({
-      title: 'Featured Space',
-      isOwned: false,
-      isFeatured: true,
-      sourceCount: 5,
-    });
+    const owned = createSpace('My Space', { isOwned: true, sourceCount: 2 });
+    const featured = createSpace('Featured Space', { isFeatured: true, sourceCount: 5 });
     const repository = new InMemoryStudySpaceRepository([owned, featured]);
     const useCase = new ListStudySpacesUseCase(repository);
 
@@ -47,5 +36,17 @@ describe('The ListStudySpacesUseCase', () => {
 
     expect(result).toHaveLength(1);
     expect(result[0].title).toBe('Featured Space');
+  });
+
+  it('lists only user-owned study spaces when the owned filter is active', async () => {
+    const owned = createSpace('My Space', { isOwned: true, sourceCount: 2 });
+    const other = createSpace('Other Space');
+    const repository = new InMemoryStudySpaceRepository([owned, other]);
+    const useCase = new ListStudySpacesUseCase(repository);
+
+    const result = await useCase.execute({ filter: 'owned' });
+
+    expect(result).toHaveLength(1);
+    expect(result[0].title).toBe('My Space');
   });
 });
