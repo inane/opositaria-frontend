@@ -11,24 +11,32 @@ import { SideNavigationComponent } from './side-navigation/side-navigation.compo
   },
   imports: [RouterOutlet, SideNavigationComponent],
   template: `
-    <header class="dashboard-header">
-      <button
-        class="burger-menu-button"
-        type="button"
-        [attr.aria-label]="isSideMenuOpen() ? 'Close menu' : 'Open menu'"
-        [attr.aria-expanded]="isSideMenuOpen()"
-        aria-controls="side-menu"
-        (click)="toggleSideMenu()"
-      >
-        <span class="burger-menu-icon" aria-hidden="true">☰</span>
-      </button>
+    <header class="dashboard-header" aria-label="Application header">
+      <div class="dashboard-header-left">
+        <button
+          class="burger-menu-button"
+          type="button"
+          [attr.aria-label]="isSideMenuOpen() ? 'Close menu' : 'Open menu'"
+          [attr.aria-expanded]="isSideMenuOpen()"
+          aria-controls="side-menu"
+          (click)="toggleSideMenu()"
+        >
+          <span class="burger-menu-icon" aria-hidden="true">☰</span>
+        </button>
+        <span class="dashboard-brand" aria-hidden="true">Opositaria</span>
+      </div>
+      <div class="dashboard-header-right">
+        <button class="dashboard-utility-button" type="button" aria-label="Notifications">
+          <span aria-hidden="true">🔔</span>
+        </button>
+        <button class="dashboard-utility-button" type="button" aria-label="Profile">
+          <span aria-hidden="true">👤</span>
+        </button>
+      </div>
     </header>
 
     <div class="dashboard-body">
-      <app-dashboard-side-navigation
-        [isOpen]="isSideMenuOpen()"
-        (itemSelected)="closeSideMenu()"
-      />
+      <app-dashboard-side-navigation [isOpen]="isSideMenuOpen()" (itemSelected)="closeSideMenu()" />
 
       <main class="dashboard-content dashboard-content--grow">
         <router-outlet />
@@ -57,7 +65,10 @@ export class DashboardComponent {
   protected closeSideMenuOnBackdropClick(event: MouseEvent): void {
     const eventTarget = event.target;
 
-    if (!(eventTarget instanceof Element) || !eventTarget.classList.contains('side-menu-backdrop')) {
+    if (
+      !(eventTarget instanceof Element) ||
+      !eventTarget.classList.contains('side-menu-backdrop')
+    ) {
       return;
     }
 

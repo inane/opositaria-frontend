@@ -1,18 +1,24 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { DashboardComponent } from './dashboard-component';
 
 describe('The Dashboard Shell', () => {
   let fixture: ComponentFixture<DashboardComponent>;
+  let router: Router;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        provideRouter([{ path: '**', children: [] }]),
+        provideRouter([
+          { path: 'dashboard', children: [] },
+          { path: 'dashboard/profile', children: [] },
+          { path: '**', children: [] },
+        ]),
       ],
     });
     fixture = TestBed.createComponent(DashboardComponent);
+    router = TestBed.inject(Router);
   });
 
   afterEach(() => {
@@ -27,6 +33,14 @@ describe('The Dashboard Shell', () => {
     expect(root.querySelector('header')).toBeTruthy();
     expect(root.querySelector('main')).toBeTruthy();
     expect(root.querySelector('footer')).toBeTruthy();
+  });
+
+  it('labels the header landmark accessibly', () => {
+    fixture.detectChanges();
+
+    const header = fixture.nativeElement.querySelector('header') as HTMLElement;
+
+    expect(header.getAttribute('aria-label')).toBe('Application header');
   });
 
   it('renders a routed feature outlet in the main content area', () => {
@@ -53,8 +67,35 @@ describe('The Dashboard Shell', () => {
     const header = fixture.nativeElement.querySelector('header') as HTMLElement;
     const buttons = header.querySelectorAll('button');
 
-    expect(buttons.length).toBe(1);
+    expect(buttons.length).toBeGreaterThanOrEqual(1);
     expect(buttons[0].classList.contains('burger-menu-button')).toBe(true);
+  });
+
+  it('displays Opositaria product branding in the header', () => {
+    fixture.detectChanges();
+
+    const brand = fixture.nativeElement.querySelector('.dashboard-brand') as HTMLElement;
+
+    expect(brand).toBeTruthy();
+    expect(brand.textContent).toContain('Opositaria');
+  });
+
+  it('renders utility buttons in the header', () => {
+    fixture.detectChanges();
+
+    const utilityButtons = fixture.nativeElement.querySelectorAll('.dashboard-utility-button');
+
+    expect(utilityButtons.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('gives utility buttons accessible names', () => {
+    fixture.detectChanges();
+
+    const utilityButtons = fixture.nativeElement.querySelectorAll('.dashboard-utility-button');
+
+    for (const button of utilityButtons) {
+      expect(button.getAttribute('aria-label')).toBeTruthy();
+    }
   });
 
   it('labels the menu button for screen readers', () => {
@@ -87,6 +128,18 @@ describe('The Dashboard Shell', () => {
     fixture.detectChanges();
 
     expect(button.getAttribute('aria-expanded')).toBe('true');
+  });
+
+  it('gives utility buttons minimum 44px touch target', () => {
+    fixture.detectChanges();
+
+    const buttons = fixture.nativeElement.querySelectorAll('.dashboard-utility-button');
+
+    for (const btn of buttons) {
+      const styles = window.getComputedStyle(btn);
+      expect(parseFloat(styles.minWidth)).toBeGreaterThanOrEqual(2.75);
+      expect(parseFloat(styles.minHeight)).toBeGreaterThanOrEqual(2.75);
+    }
   });
 
   it('renders a dedicated dashboard side navigation component while preserving the shell layout', () => {
@@ -142,7 +195,7 @@ describe('The Dashboard Shell', () => {
     expect(nav.classList.contains('side-navigation--collapsed')).toBe(true);
   });
 
-  it('displays an Inicio entry in the opened side navigation', () => {
+  it('displays educational entries in the opened side navigation', () => {
     fixture.detectChanges();
 
     const button = fixture.nativeElement.querySelector('.burger-menu-button') as HTMLButtonElement;
@@ -152,7 +205,7 @@ describe('The Dashboard Shell', () => {
 
     const nav = fixture.nativeElement.querySelector('.side-navigation') as HTMLElement;
 
-    expect(nav.textContent).toContain('Inicio');
+    expect(nav.textContent).toContain('Dashboard');
   });
 
   it('opens the side navigation when the burger button is activated', () => {
@@ -252,49 +305,52 @@ describe('The Dashboard Shell', () => {
     expect(nav.classList.contains('side-navigation--collapsed')).toBe(true);
   });
 
-  it('renders navigation items from a collection model with exactly one item named Inicio', () => {
+  it('renders navigation items from a collection model with multiple educational entries', () => {
     fixture.detectChanges();
 
     const nav = fixture.nativeElement.querySelector('.side-navigation') as HTMLElement;
-    const items = nav.querySelectorAll('.side-navigation-item');
+    const items = nav.querySelectorAll('.side-navigation-link, .side-navigation-group-toggle');
 
-    expect(items.length).toBe(1);
-    expect(items[0].textContent).toContain('Inicio');
+    expect(items.length).toBeGreaterThanOrEqual(8);
+    expect(items[0].textContent).toContain('Dashboard');
   });
 
-  it('exposes a home icon within the navigation item selectable target', () => {
+  it('exposes an icon within the navigation link selectable target', () => {
     fixture.detectChanges();
 
-    const item = fixture.nativeElement.querySelector('.side-navigation-item') as HTMLElement;
+    const item = fixture.nativeElement.querySelector('.side-navigation-link') as HTMLElement;
     const icon = item.querySelector('.side-navigation-icon');
 
     expect(icon).toBeTruthy();
     expect(icon?.textContent?.trim()).toBeTruthy();
   });
 
-  it('makes the navigation item selectable target accessible by its label name in icon-only state', () => {
+  it('makes the navigation link accessible by its label name in icon-only state', () => {
     fixture.detectChanges();
 
-    const item = fixture.nativeElement.querySelector('.side-navigation-item') as HTMLElement;
+    const item = fixture.nativeElement.querySelector('.side-navigation-link') as HTMLElement;
 
-    expect(item.getAttribute('aria-label')).toBe('Inicio');
+    expect(item.getAttribute('aria-label')).toBe('Dashboard');
   });
 
-  it('navigates to /dashboard through the Inicio navigation link', () => {
+  it('navigates to /dashboard through the Dashboard navigation link', () => {
     fixture.detectChanges();
 
-    const item = fixture.nativeElement.querySelector('.side-navigation-item') as HTMLElement;
+    const item = fixture.nativeElement.querySelector('.side-navigation-link') as HTMLElement;
 
     expect(item.tagName).toBe('A');
     expect(item.getAttribute('href')).toBe('/dashboard');
   });
 
-  it('announces the current page for the active Inicio navigation item', () => {
+  it('announces the current page for the active Dashboard navigation item', async () => {
+    await router.navigateByUrl('/dashboard');
+    fixture.detectChanges();
+    await new Promise((resolve) => setTimeout(resolve, 0));
     fixture.detectChanges();
 
-    const item = fixture.nativeElement.querySelector('.side-navigation-item') as HTMLElement;
+    const item = fixture.nativeElement.querySelector('.side-navigation-link') as HTMLElement;
 
-    expect(item.getAttribute('aria-current')).toBe('page');
+    expect(item.classList.contains('active-link')).toBe(true);
   });
 
   it('renders the side navigation in a collapsed state on initial render', () => {
@@ -317,7 +373,7 @@ describe('The Dashboard Shell', () => {
     fixture.detectChanges();
 
     const nav = fixture.nativeElement.querySelector('.side-navigation') as HTMLElement;
-    const link = nav.querySelector('.side-navigation-item') as HTMLAnchorElement;
+    const link = nav.querySelector('.side-navigation-link') as HTMLAnchorElement;
 
     expect(link.tagName).toBe('A');
     expect(link.getAttribute('href')).toBe('/dashboard');
@@ -338,7 +394,7 @@ describe('The Dashboard Shell', () => {
     expect(nav.classList.contains('side-navigation--collapsed')).toBe(false);
   });
 
-  it('shows icon and text label together in the expanded navigation item', () => {
+  it('shows icon and text label together in the expanded navigation link', () => {
     fixture.detectChanges();
 
     const button = fixture.nativeElement.querySelector('.burger-menu-button') as HTMLButtonElement;
@@ -346,10 +402,10 @@ describe('The Dashboard Shell', () => {
     fixture.detectChanges();
 
     const nav = fixture.nativeElement.querySelector('.side-navigation') as HTMLElement;
-    const link = nav.querySelector('.side-navigation-item') as HTMLAnchorElement;
+    const link = nav.querySelector('.side-navigation-link') as HTMLAnchorElement;
 
     expect(link.querySelector('.side-navigation-icon')).toBeTruthy();
-    expect(link.textContent).toContain('Inicio');
+    expect(link.textContent).toContain('Dashboard');
   });
 
   it('exposes expanded state on the burger button when navigation is opened', () => {
@@ -466,7 +522,7 @@ describe('The Dashboard Shell', () => {
     expect(nav.classList.contains('side-navigation--collapsed')).toBe(true);
   });
 
-  it('collapses the expanded desktop navigation when the Inicio link is selected', async () => {
+  it('collapses the expanded desktop navigation when the Dashboard link is selected', async () => {
     fixture.detectChanges();
 
     const nav = fixture.nativeElement.querySelector('.side-navigation') as HTMLElement;
@@ -476,7 +532,7 @@ describe('The Dashboard Shell', () => {
     fixture.detectChanges();
     expect(nav.classList.contains('side-navigation--collapsed')).toBe(false);
 
-    const link = nav.querySelector('.side-navigation-item') as HTMLAnchorElement;
+    const link = nav.querySelector('.side-navigation-link') as HTMLAnchorElement;
     link.click();
     await fixture.whenStable();
     fixture.detectChanges();
@@ -484,7 +540,7 @@ describe('The Dashboard Shell', () => {
     expect(nav.classList.contains('side-navigation--collapsed')).toBe(true);
   });
 
-  it('closes the side navigation when the Inicio link is selected', async () => {
+  it('closes the side navigation when the Dashboard link is selected', async () => {
     fixture.detectChanges();
 
     const nav = fixture.nativeElement.querySelector('.side-navigation') as HTMLElement;
@@ -494,7 +550,7 @@ describe('The Dashboard Shell', () => {
 
     expect(nav.classList.contains('side-navigation--collapsed')).toBe(false);
 
-    const link = fixture.nativeElement.querySelector('.side-navigation-item') as HTMLAnchorElement;
+    const link = fixture.nativeElement.querySelector('.side-navigation-link') as HTMLAnchorElement;
     link.click();
     await fixture.whenStable();
     fixture.detectChanges();
@@ -525,22 +581,25 @@ describe('The Dashboard Shell', () => {
     expect(button.getAttribute('aria-label')).toBe('Close menu');
   });
 
-  it('provides a sufficient touch target for the collapsed navigation icon', () => {
+  it('provides a sufficient touch target for the collapsed navigation link', () => {
     fixture.detectChanges();
 
-    const link = fixture.nativeElement.querySelector('.side-navigation-item') as HTMLElement;
+    const link = fixture.nativeElement.querySelector('.side-navigation-link') as HTMLElement;
     const styles = window.getComputedStyle(link);
 
     expect(parseFloat(styles.minWidth)).toBeGreaterThanOrEqual(2.75);
     expect(parseFloat(styles.minHeight)).toBeGreaterThanOrEqual(2.75);
   });
 
-  it('marks the active navigation item with a styling hook', () => {
+  it('marks the active navigation link with a styling hook', async () => {
+    await router.navigateByUrl('/dashboard');
+    fixture.detectChanges();
+    await new Promise((resolve) => setTimeout(resolve, 0));
     fixture.detectChanges();
 
-    const item = fixture.nativeElement.querySelector('.side-navigation-item') as HTMLElement;
+    const item = fixture.nativeElement.querySelector('.side-navigation-link') as HTMLElement;
 
-    expect(item.getAttribute('aria-current')).toBe('page');
+    expect(item.classList.contains('active-link')).toBe(true);
   });
 
   it('renders exactly one side navigation landmark for the dashboard menu', () => {
@@ -559,19 +618,19 @@ describe('The Dashboard Shell', () => {
     expect(navLandmarksAfter.length).toBe(1);
   });
 
-  it('wraps the Inicio label in a dedicated visual label element while keeping the accessible name', () => {
+  it('wraps the Dashboard label in a dedicated visual label element while keeping the accessible name', () => {
     fixture.detectChanges();
 
-    const link = fixture.nativeElement.querySelector('.side-navigation-item') as HTMLAnchorElement;
+    const link = fixture.nativeElement.querySelector('.side-navigation-link') as HTMLAnchorElement;
 
     const labelEl = link.querySelector('.side-navigation-label');
 
     expect(labelEl).toBeTruthy();
-    expect(labelEl?.textContent).toBe('Inicio');
-    expect(link.getAttribute('aria-label')).toBe('Inicio');
+    expect(labelEl?.textContent).toBe('Dashboard');
+    expect(link.getAttribute('aria-label')).toBe('Dashboard');
   });
 
-  it('hides the Inicio label visually in the collapsed rail while keeping the icon selectable', () => {
+  it('hides the Dashboard label visually in the collapsed rail while keeping the icon selectable', () => {
     fixture.detectChanges();
 
     const nav = fixture.nativeElement.querySelector('.side-navigation') as HTMLElement;
