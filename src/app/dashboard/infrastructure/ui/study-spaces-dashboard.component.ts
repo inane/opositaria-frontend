@@ -16,7 +16,7 @@ import { SaveStudySpaceUseCase } from '../../application/SaveStudySpaceUseCase';
       <!-- Header -->
       <header class="dashboard-header">
         <div class="dashboard-header-left">
-          <span class="dashboard-brand" aria-hidden="true">Opositaria</span>
+          <h1 class="dashboard-title">Study spaces</h1>
         </div>
         <div class="dashboard-header-right">
           <button mat-icon-button type="button" aria-label="Notifications">
