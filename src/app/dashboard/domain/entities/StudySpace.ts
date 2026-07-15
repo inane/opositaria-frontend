@@ -22,6 +22,10 @@ export class StudySpace {
       throw DomainError.createValidation('Study space title must not be empty');
     }
 
+    if (params.sourceCount < 0) {
+      throw DomainError.createValidation('Study space source count must not be negative');
+    }
+
     return new StudySpace(
       crypto.randomUUID(),
       params.title,

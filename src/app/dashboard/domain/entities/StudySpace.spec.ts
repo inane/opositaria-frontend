@@ -30,4 +30,15 @@ describe('The StudySpace', () => {
       }),
     ).toThrow(DomainError);
   });
+
+  it('rejects a negative source count', () => {
+    expect(() =>
+      StudySpace.create({
+        title: 'Algebraic Structures',
+        isOwned: true,
+        isFeatured: false,
+        sourceCount: -1,
+      }),
+    ).toThrow(DomainError);
+  });
 });
