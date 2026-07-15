@@ -49,4 +49,17 @@ describe('The ListStudySpacesUseCase', () => {
     expect(result).toHaveLength(1);
     expect(result[0].title).toBe('My Space');
   });
+
+  it('combines active filter and search term together', async () => {
+    const myAlgebra = createSpace('My Algebra Notes', { isOwned: true, sourceCount: 3 });
+    const myGeometry = createSpace('Geometry Notes', { isOwned: true, sourceCount: 2 });
+    const featuredAlgebra = createSpace('Algebra Textbook', { isFeatured: true, sourceCount: 10 });
+    const repository = new InMemoryStudySpaceRepository([myAlgebra, myGeometry, featuredAlgebra]);
+    const useCase = new ListStudySpacesUseCase(repository);
+
+    const ownedAlgebraResult = await useCase.execute({ filter: 'owned', search: 'algebra' });
+
+    expect(ownedAlgebraResult).toHaveLength(1);
+    expect(ownedAlgebraResult[0].title).toBe('My Algebra Notes');
+  });
 });
