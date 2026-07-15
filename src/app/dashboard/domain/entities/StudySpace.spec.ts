@@ -41,4 +41,19 @@ describe('The StudySpace', () => {
       }),
     ).toThrow(DomainError);
   });
+
+  it('matches title by a case-insensitive search term', () => {
+    const space = StudySpace.create({
+      title: 'Algebraic Structures',
+      isOwned: true,
+      isFeatured: false,
+      sourceCount: 3,
+    });
+
+    expect(space.matches('algebraic')).toBe(true);
+    expect(space.matches('ALGEBRAIC')).toBe(true);
+    expect(space.matches('Algebraic')).toBe(true);
+    expect(space.matches('Structures')).toBe(true);
+    expect(space.matches('Geometry')).toBe(false);
+  });
 });

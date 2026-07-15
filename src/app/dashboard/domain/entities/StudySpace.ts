@@ -39,4 +39,8 @@ export class StudySpace {
   get sourceCountLabel(): string {
     return this.sourceCount === 1 ? '1 source' : `${this.sourceCount} sources`;
   }
+
+  matches(searchTerm: string): boolean {
+    return this.title.toLowerCase().includes(searchTerm.toLowerCase());
+  }
 }
