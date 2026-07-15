@@ -33,27 +33,27 @@ import { SaveStudySpaceUseCase } from '../../application/SaveStudySpaceUseCase';
         <div class="dashboard-tabs" role="tablist" aria-label="Study space filters">
           <button
             class="dashboard-tab"
-            [class.dashboard-tab--active]="activeFilter() === 'all'"
+            [class.dashboard-tab--active]="activeFilter === 'all'"
             role="tab"
-            [attr.aria-selected]="activeFilter() === 'all'"
+            [attr.aria-selected]="activeFilter === 'all'"
             (click)="store.setFilter('all')"
           >
             All
           </button>
           <button
             class="dashboard-tab"
-            [class.dashboard-tab--active]="activeFilter() === 'owned'"
+            [class.dashboard-tab--active]="activeFilter === 'owned'"
             role="tab"
-            [attr.aria-selected]="activeFilter() === 'owned'"
+            [attr.aria-selected]="activeFilter === 'owned'"
             (click)="store.setFilter('owned')"
           >
             My spaces
           </button>
           <button
             class="dashboard-tab"
-            [class.dashboard-tab--active]="activeFilter() === 'featured'"
+            [class.dashboard-tab--active]="activeFilter === 'featured'"
             role="tab"
-            [attr.aria-selected]="activeFilter() === 'featured'"
+            [attr.aria-selected]="activeFilter === 'featured'"
             (click)="store.setFilter('featured')"
           >
             Featured
@@ -82,11 +82,11 @@ import { SaveStudySpaceUseCase } from '../../application/SaveStudySpaceUseCase';
       <main class="dashboard-content">
         @if (store.isCreateFlowOpen()) {
           <router-outlet />
-        } @else if (emptyStateMessage(); as msg) {
+        } @else if (emptyStateMessage; as message) {
           <div class="dashboard-empty">
             <mat-icon class="dashboard-empty-icon" aria-hidden="true">folder_open</mat-icon>
-            <p class="dashboard-empty-text">{{ msg }}</p>
-            @if (msg.startsWith('No study spaces')) {
+            <p class="dashboard-empty-text">{{ message }}</p>
+            @if (message.startsWith('No study spaces')) {
               <button mat-stroked-button type="button" (click)="store.openCreateFlow()">
                 <mat-icon aria-hidden="true">add</mat-icon>
                 Create new
@@ -306,18 +306,16 @@ export class StudySpacesDashboardComponent {
   readonly store: DashboardStore;
 
   constructor() {
-    const repository = new InMemoryStudySpaceRepository(StudySpacesDashboardComponent.seedSpaces());
+    const repository = new InMemoryStudySpaceRepository(StudySpacesDashboardComponent.seedSpaces);
     this.store = new DashboardStore(
       new ListStudySpacesUseCase(repository),
       new SaveStudySpaceUseCase(repository),
     );
-    this.store.init();
+    void this.store.init();
   }
 
-  protected readonly emptyStateMessage = () => this.store.emptyStateReason();
-  protected readonly activeFilter = () => this.store.activeFilter();
+  protected get emptyStateMessage() { return this.store.emptyStateReason(); }
+  protected get activeFilter() { return this.store.activeFilter(); }
 
-  static seedSpaces(): StudySpace[] {
-    return [];
-  }
+  static readonly seedSpaces: StudySpace[] = [];
 }

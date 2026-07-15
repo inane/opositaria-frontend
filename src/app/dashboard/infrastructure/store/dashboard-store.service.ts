@@ -9,7 +9,8 @@ export interface PendingSaveState {
 
 export class DashboardStore {
   private readonly rawSpaces = signal<StudySpace[]>([]);
-  readonly activeFilter = signal<StudySpaceFilter>('all');
+  private readonly activeFilterSignal = signal<StudySpaceFilter>('all');
+  readonly activeFilter = this.activeFilterSignal.asReadonly();
   private readonly searchTerm = signal('');
   private readonly createFlowOpen = signal(false);
   private readonly pendingSave = signal<PendingSaveState | null>(null);
@@ -54,7 +55,7 @@ export class DashboardStore {
   }
 
   setFilter(filter: StudySpaceFilter): void {
-    this.activeFilter.set(filter);
+    this.activeFilterSignal.set(filter);
   }
 
   setSearchTerm(term: string): void {
