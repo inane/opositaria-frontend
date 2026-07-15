@@ -2,6 +2,7 @@ import { StudySpace } from '../entities/StudySpace';
 
 export interface StudySpaceRepository {
   listAll(): Promise<StudySpace[]>;
+  save(space: StudySpace): Promise<void>;
 }
 
 export class InMemoryStudySpaceRepository implements StudySpaceRepository {
@@ -13,5 +14,9 @@ export class InMemoryStudySpaceRepository implements StudySpaceRepository {
 
   async listAll(): Promise<StudySpace[]> {
     return [...this.spaces];
+  }
+
+  async save(space: StudySpace): Promise<void> {
+    this.spaces.push(space);
   }
 }

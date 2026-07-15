@@ -24,4 +24,20 @@ describe('The StudySpaceRepository', () => {
     expect(spaces).toContain(space1);
     expect(spaces).toContain(space2);
   });
+
+  it('saves a new study space and includes it in the listing', async () => {
+    const repository = new InMemoryStudySpaceRepository();
+    const space = StudySpace.create({
+      title: 'New Space',
+      isOwned: true,
+      isFeatured: false,
+      sourceCount: 2,
+    });
+
+    await repository.save(space);
+    const spaces = await repository.listAll();
+
+    expect(spaces).toHaveLength(1);
+    expect(spaces[0].title).toBe('New Space');
+  });
 });
