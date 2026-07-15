@@ -1,5 +1,7 @@
 import { DomainError } from './DomainError';
 
+export type StudySpaceFilter = 'all' | 'owned' | 'featured';
+
 export interface StudySpaceCreationParams {
   title: string;
   isOwned: boolean;
@@ -42,5 +44,11 @@ export class StudySpace {
 
   matches(searchTerm: string): boolean {
     return this.title.toLowerCase().includes(searchTerm.toLowerCase());
+  }
+
+  static matchesFilter(space: StudySpace, filter: StudySpaceFilter): boolean {
+    if (filter === 'all') return true;
+    if (filter === 'owned') return space.isOwned;
+    return space.isFeatured;
   }
 }

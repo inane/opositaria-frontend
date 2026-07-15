@@ -56,4 +56,37 @@ describe('The StudySpace', () => {
     expect(space.matches('Structures')).toBe(true);
     expect(space.matches('Geometry')).toBe(false);
   });
+
+  it('identifies filter membership for all, owned, not owned, featured, and not featured', () => {
+    const ownedSpace = StudySpace.create({
+      title: 'My Space',
+      isOwned: true,
+      isFeatured: false,
+      sourceCount: 2,
+    });
+    const featuredSpace = StudySpace.create({
+      title: 'Featured Space',
+      isOwned: false,
+      isFeatured: true,
+      sourceCount: 5,
+    });
+    const otherSpace = StudySpace.create({
+      title: 'Other Space',
+      isOwned: false,
+      isFeatured: false,
+      sourceCount: 0,
+    });
+
+    expect(StudySpace.matchesFilter(ownedSpace, 'all')).toBe(true);
+    expect(StudySpace.matchesFilter(featuredSpace, 'all')).toBe(true);
+    expect(StudySpace.matchesFilter(otherSpace, 'all')).toBe(true);
+
+    expect(StudySpace.matchesFilter(ownedSpace, 'owned')).toBe(true);
+    expect(StudySpace.matchesFilter(featuredSpace, 'owned')).toBe(false);
+    expect(StudySpace.matchesFilter(otherSpace, 'owned')).toBe(false);
+
+    expect(StudySpace.matchesFilter(ownedSpace, 'featured')).toBe(false);
+    expect(StudySpace.matchesFilter(featuredSpace, 'featured')).toBe(true);
+    expect(StudySpace.matchesFilter(otherSpace, 'featured')).toBe(false);
+  });
 });
