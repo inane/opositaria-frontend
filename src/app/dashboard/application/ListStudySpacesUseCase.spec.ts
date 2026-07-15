@@ -62,4 +62,14 @@ describe('The ListStudySpacesUseCase', () => {
     expect(ownedAlgebraResult).toHaveLength(1);
     expect(ownedAlgebraResult[0].title).toBe('My Algebra Notes');
   });
+
+  it('returns an empty list when no spaces match the search term', async () => {
+    const space = createSpace('Algebraic Structures', { isOwned: true, sourceCount: 3 });
+    const repository = new InMemoryStudySpaceRepository([space]);
+    const useCase = new ListStudySpacesUseCase(repository);
+
+    const result = await useCase.execute({ search: 'Geometry' });
+
+    expect(result).toHaveLength(0);
+  });
 });
