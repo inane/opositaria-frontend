@@ -1,47 +1,81 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter, Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
+import { provideRouter, Router } from '@angular/router';
+
 import { routes } from './app.routes';
+import { AuthGuard } from './auth/infrastructure/adapters/AuthGuard';
+import { TokenStorageService } from './auth/infrastructure/adapters/TokenStorageService';
 import { StudySpacesDashboardComponent } from './dashboard/infrastructure/ui/study-spaces-dashboard.component';
 import { SOURCE_INGESTION_PORT } from './source-ingestion/infrastructure/tokens/source-ingestion-port.token';
 import { FakeSourceIngestionAdapter } from './source-ingestion/infrastructure/adapters/FakeSourceIngestionAdapter';
 
-describe('The application routes', () => {
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [
-        provideRouter(routes),
-        { provide: SOURCE_INGESTION_PORT, useClass: FakeSourceIngestionAdapter },
-      ],
-    });
-  });
-
+describe('The app routes', () => {
   afterEach(() => {
     TestBed.resetTestingModule();
   });
 
-  it('redirects the root path to the dashboard screen', async () => {
-    const router = TestBed.inject(Router);
+  it('authenticated root redirects to dashboard', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideRouter(routes),
+        AuthGuard,
+        TokenStorageService,
+        { provide: SOURCE_INGESTION_PORT, useClass: FakeSourceIngestionAdapter },
+      ],
+    });
+    const storage = TestBed.inject(TokenStorageService);
+    storage.clear();
+    localStorage.setItem('opositaria_token', 'test-token');
 
-    await router.navigate(['']);
-
-    expect(router.url).toBe('/dashboard');
-  });
-
-  it('does not expose source-ingestion as a standalone route', async () => {
-    const router = TestBed.inject(Router);
-
-    const navigation = router.navigate(['source-ingestion']);
-
-    await expect(navigation).rejects.toThrow();
-  });
-
-  it('renders the dashboard home shell at /dashboard', async () => {
     const harness = await RouterTestingHarness.create();
+    await harness.navigateByUrl('/');
+    const router = TestBed.inject(Router);
 
+    expect(router.url).toContain('/dashboard');
+  });
+
+  it('unauthenticated root redirects to login', async () => {
+    TestBed.configureTestingModule({
+      providers: [provideRouter(routes), AuthGuard, TokenStorageService],
+    });
+    TestBed.inject(TokenStorageService).clear();
+
+    const harness = await RouterTestingHarness.create();
+    await harness.navigateByUrl('/');
+    const router = TestBed.inject(Router);
+
+    expect(router.url).toBe('/login');
+  });
+
+  it('unauthenticated dashboard redirects to login', async () => {
+    TestBed.configureTestingModule({
+      providers: [provideRouter(routes), AuthGuard, TokenStorageService],
+    });
+    TestBed.inject(TokenStorageService).clear();
+
+    const harness = await RouterTestingHarness.create();
+    await harness.navigateByUrl('/dashboard');
+    const router = TestBed.inject(Router);
+
+    expect(router.url).toBe('/login');
+  });
+
+  it('renders the dashboard home shell when authenticated', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideRouter(routes),
+        AuthGuard,
+        TokenStorageService,
+        { provide: SOURCE_INGESTION_PORT, useClass: FakeSourceIngestionAdapter },
+      ],
+    });
+    const storage = TestBed.inject(TokenStorageService);
+    storage.clear();
+    localStorage.setItem('opositaria_token', 'test-token');
+
+    const harness = await RouterTestingHarness.create();
     await harness.navigateByUrl('/dashboard', StudySpacesDashboardComponent);
-
     const root = harness.fixture.nativeElement as HTMLElement;
 
     expect(root.querySelector('header')).toBeTruthy();

@@ -1,6 +1,11 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('The study spaces dashboard', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/login');
+    await page.evaluate(() => localStorage.setItem('opositaria_token', 'test-token'));
+  });
+
   test('redirects visitors from the root path to the dashboard', async ({ page }) => {
     await page.goto('/');
 
