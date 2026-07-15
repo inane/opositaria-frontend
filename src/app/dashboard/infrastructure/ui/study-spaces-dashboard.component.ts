@@ -1,22 +1,22 @@
 import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { RouterOutlet } from '@angular/router';
 import { DashboardStore } from '../store/dashboard-store.service';
-import { StudySpaceFilter, StudySpace } from '../../domain/entities/StudySpace';
-import { InMemoryStudySpaceRepository } from '../../domain/repositories/StudySpaceRepository';
+import { StudySpace } from '../../domain/entities/StudySpace';
+import { LocalStudySpaceRepository } from '../adapters/LocalStudySpaceRepository';
 import { ListStudySpacesUseCase } from '../../application/ListStudySpacesUseCase';
 import { SaveStudySpaceUseCase } from '../../application/SaveStudySpaceUseCase';
+import { SourceIngestionComponent } from '../../../source-ingestion/infrastructure/ui/source-ingestion.component';
 
 @Component({
   selector: 'app-study-spaces-dashboard',
-  imports: [MatButtonModule, MatIconModule, RouterOutlet],
+  imports: [MatButtonModule, MatIconModule, SourceIngestionComponent],
   template: `
     <div class="study-spaces-dashboard">
       <!-- Header -->
       <header class="dashboard-header">
         <div class="dashboard-header-left">
-          <h3 class="dashboard-title">Opositaria</h3>
+          <h1 class="dashboard-title">Opositaria</h1>
         </div>
         <div class="dashboard-header-right">
           <button mat-icon-button type="button" aria-label="Notifications">
@@ -81,7 +81,32 @@ import { SaveStudySpaceUseCase } from '../../application/SaveStudySpaceUseCase';
       <!-- Main content area -->
       <main class="dashboard-content">
         @if (store.isCreateFlowOpen()) {
-          <router-outlet />
+          @if (store.pendingSaveState(); as pendingSave) {
+            <section class="save-space-panel" aria-labelledby="save-space-title">
+              <h2 id="save-space-title">Save study space</h2>
+              <p>{{ pendingSave.uploadedSourceCount }} source ready.</p>
+              <label class="space-name-label" for="study-space-name">Study space name</label>
+              <input
+                id="study-space-name"
+                class="space-name-input"
+                #spaceName
+                type="text"
+                placeholder="My study space"
+              />
+              @if (store.saveValidationMessage(); as validationMessage) {
+                <p role="alert" class="validation-message">{{ validationMessage }}</p>
+              }
+              <div class="save-space-actions">
+                <button mat-stroked-button type="button" (click)="store.skipSaving()">Skip saving</button>
+                <button mat-flat-button type="button" (click)="store.savePendingSpace(spaceName.value)">
+                  Save study space
+                </button>
+              </div>
+            </section>
+          } @else {
+            <app-source-ingestion (sourceIngested)="store.recordUploadedSources($event.sourceCount)" />
+            <button mat-button type="button" (click)="store.cancelCreation()">Cancel creation</button>
+          }
         } @else if (emptyStateMessage; as message) {
           <div class="dashboard-empty">
             <mat-icon class="dashboard-empty-icon" aria-hidden="true">folder_open</mat-icon>
@@ -96,7 +121,7 @@ import { SaveStudySpaceUseCase } from '../../application/SaveStudySpaceUseCase';
         } @else {
           <div class="dashboard-grid">
             @for (space of store.visibleSpaces(); track space.id) {
-              <div class="space-card" tabindex="0" role="article" [attr.aria-label]="space.title">
+              <article class="space-card" [attr.aria-label]="space.title">
                 <div class="space-card-visual" aria-hidden="true">
                   <mat-icon>description</mat-icon>
                 </div>
@@ -104,7 +129,7 @@ import { SaveStudySpaceUseCase } from '../../application/SaveStudySpaceUseCase';
                   <h3 class="space-card-title">{{ space.title }}</h3>
                   <p class="space-card-meta">{{ space.sourceCountLabel }}</p>
                 </div>
-              </div>
+              </article>
             }
           </div>
         }
@@ -134,6 +159,11 @@ import { SaveStudySpaceUseCase } from '../../application/SaveStudySpaceUseCase';
     .dashboard-brand {
       font-size: 1.125rem;
       font-weight: 600;
+    }
+    .dashboard-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin: 0;
     }
     .dashboard-header-right {
       display: flex;
@@ -224,12 +254,9 @@ import { SaveStudySpaceUseCase } from '../../application/SaveStudySpaceUseCase';
       border-radius: 12px;
       overflow: hidden;
       box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-      cursor: pointer;
       transition: box-shadow 0.2s, transform 0.2s;
-      outline: none;
     }
-    .space-card:hover,
-    .space-card:focus-visible {
+    .space-card:hover {
       box-shadow: 0 4px 12px rgba(0,0,0,0.12);
       transform: translateY(-2px);
     }
@@ -281,6 +308,34 @@ import { SaveStudySpaceUseCase } from '../../application/SaveStudySpaceUseCase';
       color: #6b7280;
       margin: 0 0 1.5rem;
     }
+    .save-space-panel {
+      max-width: 34rem;
+      padding: 1.5rem;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .space-name-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    .space-name-input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0.75rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      font: inherit;
+    }
+    .validation-message {
+      color: #b91c1c;
+    }
+    .save-space-actions {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
     /* Responsive */
     @media (max-width: 768px) {
       .dashboard-toolbar {
@@ -306,7 +361,7 @@ export class StudySpacesDashboardComponent {
   readonly store: DashboardStore;
 
   constructor() {
-    const repository = new InMemoryStudySpaceRepository(StudySpacesDashboardComponent.seedSpaces);
+    const repository = new LocalStudySpaceRepository(StudySpacesDashboardComponent.seedSpaces);
     this.store = new DashboardStore(
       new ListStudySpacesUseCase(repository),
       new SaveStudySpaceUseCase(repository),

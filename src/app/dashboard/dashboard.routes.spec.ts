@@ -10,14 +10,10 @@ describe('The dashboard routes', () => {
     expect(homeRoute.component).toBe(StudySpacesDashboardComponent);
   });
 
-  it('resolves source ingestion as a child route inside the dashboard', async () => {
+  it('does not expose source ingestion as an implicit dashboard child route', () => {
     const homeRoute = dashboardRoutes[0];
-    const childRoute = homeRoute.children?.[0];
 
-    const childRoutes = await childRoute?.loadChildren?.();
-
-    expect(childRoute?.path).toBe('');
-    expect(childRoutes).toEqual([{ path: '', component: expect.any(Function) }]);
+    expect(homeRoute.children?.some((route) => route.path === '' && route.loadChildren)).toBe(false);
   });
 
   it('provides a fallback route for unknown dashboard paths', () => {

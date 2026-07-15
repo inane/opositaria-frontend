@@ -7,13 +7,6 @@ export const dashboardRoutes: Routes = [
     component: StudySpacesDashboardComponent,
     children: [
       {
-        path: '',
-        loadChildren: () =>
-          import('../source-ingestion/source-ingestion.routes').then(
-            (m) => m.sourceIngestionRoutes,
-          ),
-      },
-      {
         path: '**',
         redirectTo: '',
       },
