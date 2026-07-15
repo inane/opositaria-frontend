@@ -26,4 +26,26 @@ describe('The ListStudySpacesUseCase', () => {
     expect(result).toContain(space1);
     expect(result).toContain(space2);
   });
+
+  it('lists only featured study spaces when the featured filter is active', async () => {
+    const owned = StudySpace.create({
+      title: 'My Space',
+      isOwned: true,
+      isFeatured: false,
+      sourceCount: 2,
+    });
+    const featured = StudySpace.create({
+      title: 'Featured Space',
+      isOwned: false,
+      isFeatured: true,
+      sourceCount: 5,
+    });
+    const repository = new InMemoryStudySpaceRepository([owned, featured]);
+    const useCase = new ListStudySpacesUseCase(repository);
+
+    const result = await useCase.execute({ filter: 'featured' });
+
+    expect(result).toHaveLength(1);
+    expect(result[0].title).toBe('Featured Space');
+  });
 });
