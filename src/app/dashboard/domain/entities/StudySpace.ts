@@ -1,3 +1,5 @@
+import { DomainError } from './DomainError';
+
 export interface StudySpaceCreationParams {
   title: string;
   isOwned: boolean;
@@ -16,6 +18,10 @@ export class StudySpace {
   ) {}
 
   static create(params: StudySpaceCreationParams): StudySpace {
+    if (params.title.trim().length === 0) {
+      throw DomainError.createValidation('Study space title must not be empty');
+    }
+
     return new StudySpace(
       crypto.randomUUID(),
       params.title,
