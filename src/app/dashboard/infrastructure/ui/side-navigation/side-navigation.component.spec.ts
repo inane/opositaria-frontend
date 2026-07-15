@@ -55,7 +55,7 @@ describe('The Dashboard Side Navigation', () => {
   it('renders one side navigation landmark for the dashboard menu', () => {
     fixture.detectChanges();
 
-    const navLandmarks = fixture.nativeElement.querySelectorAll('[role="navigation"]');
+    const navLandmarks = fixture.nativeElement.querySelectorAll('mat-nav-list');
     const nav = navLandmarks[0] as HTMLElement;
 
     expect(navLandmarks.length).toBe(1);
@@ -71,6 +71,7 @@ describe('The Dashboard Side Navigation', () => {
     expect(link).toBeTruthy();
     expect(link.textContent).toContain('Dashboard');
     expect(link.getAttribute('aria-label')).toBe('Dashboard');
+    expect(link.hasAttribute('mat-list-item')).toBe(true);
   });
 
   it('renders Syllabus as a group control', () => {

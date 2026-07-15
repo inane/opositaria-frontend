@@ -1,24 +1,25 @@
 import { Component, inject, input, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { MatListModule } from '@angular/material/list';
 import { educationalMenu, NavigationEntry } from '../../../domain/navigation-menu';
 
 @Component({
   selector: 'app-dashboard-side-navigation',
-  imports: [RouterLink, RouterLinkActive],
+  imports: [RouterLink, RouterLinkActive, MatListModule],
   styleUrl: './side-navigation.component.css',
   template: `
-    <nav
+    <mat-nav-list
       class="side-navigation"
       [class.side-navigation--collapsed]="!isOpen()"
       [class.side-navigation--rail]="!isOpen()"
-      role="navigation"
       aria-label="Side menu"
       id="side-menu"
     >
       @for (entry of entries; track entry.label) {
         @if (entry.type === 'link') {
           <a
+            mat-list-item
             class="side-navigation-link"
             [routerLink]="entry.path"
             routerLinkActive="active-link"
@@ -45,6 +46,7 @@ import { educationalMenu, NavigationEntry } from '../../../domain/navigation-men
             <div class="side-navigation-group-children">
               @for (child of entry.children; track child.label) {
                 <a
+                  mat-list-item
                   class="side-navigation-link"
                   [routerLink]="child.path"
                   routerLinkActive="active-link"
@@ -60,7 +62,7 @@ import { educationalMenu, NavigationEntry } from '../../../domain/navigation-men
           }
         }
       }
-    </nav>
+    </mat-nav-list>
   `,
 })
 export class SideNavigationComponent {

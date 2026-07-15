@@ -45,9 +45,10 @@ describe('The SourceIngestionComponent', () => {
   it('gives the primary action an accessible name', () => {
     fixture.detectChanges();
 
-    const button = fixture.nativeElement.querySelector('opo-button button');
+    const button = fixture.nativeElement.querySelector('button');
 
     expect(button?.textContent?.trim()).toBe('Start ingestion');
+    expect(button?.hasAttribute('mat-button')).toBe(true);
   });
 
   it('renders an accessible PDF file selection control', () => {
@@ -153,9 +154,7 @@ describe('The SourceIngestionComponent', () => {
 
     expect(fixture.nativeElement.textContent).toContain('Error');
 
-    const retryButton = fixture.nativeElement.querySelector(
-      '[data-testid="retry-ingestion"] button',
-    );
+    const retryButton = fixture.nativeElement.querySelector('[data-testid="retry-ingestion"]');
 
     expect(retryButton).toBeTruthy();
     expect(retryButton.textContent?.trim()).toBe('Try again');
@@ -182,14 +181,12 @@ describe('The SourceIngestionComponent', () => {
     await store.refreshStatus();
     fixture.detectChanges();
 
-    const chatAction = fixture.nativeElement.querySelector('[data-testid="action-chat"] button');
-    const summaryAction = fixture.nativeElement.querySelector(
-      '[data-testid="action-summary"] button',
-    );
-    const testAction = fixture.nativeElement.querySelector('[data-testid="action-test"] button');
-    const planAction = fixture.nativeElement.querySelector('[data-testid="action-plan"] button');
+    const chatAction = fixture.nativeElement.querySelector('[data-testid="action-chat"]');
+    const summaryAction = fixture.nativeElement.querySelector('[data-testid="action-summary"]');
+    const testAction = fixture.nativeElement.querySelector('[data-testid="action-test"]');
+    const planAction = fixture.nativeElement.querySelector('[data-testid="action-plan"]');
     const recommendationsAction = fixture.nativeElement.querySelector(
-      '[data-testid="action-recommendations"] button',
+      '[data-testid="action-recommendations"]',
     );
 
     expect(chatAction).toBeTruthy();

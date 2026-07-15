@@ -34,27 +34,6 @@
   color: var(--opo-color-primary);
 }
 
-.dashboard-utility-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 2.75rem;
-  min-height: 2.75rem;
-  padding: var(--opo-space-2);
-  border: none;
-  background: transparent;
-  color: var(--opo-color-text);
-  font-size: 1.125rem;
-  cursor: pointer;
-  border-radius: var(--opo-radius-sm);
-}
-
-.dashboard-utility-button:focus-visible {
-  outline: none;
-  box-shadow: var(--opo-focus-ring);
-  border-radius: var(--opo-radius-sm);
-}
-
 .dashboard-footer {
   flex: 0 0 auto;
   padding: var(--opo-space-4);

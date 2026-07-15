@@ -1,9 +1,8 @@
 import { Component, inject } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatChipsModule } from '@angular/material/chips';
 import {
-  AlertComponent,
-  BadgeComponent,
-  ButtonComponent,
-  CardComponent,
   PageHeaderComponent,
   PageSectionComponent,
   StatusPanelComponent,
@@ -16,10 +15,9 @@ import { IngestionJob } from '../../domain/entities/IngestionJob';
 @Component({
   selector: 'app-source-ingestion',
   imports: [
-    AlertComponent,
-    BadgeComponent,
-    ButtonComponent,
-    CardComponent,
+    MatButtonModule,
+    MatCardModule,
+    MatChipsModule,
     PageHeaderComponent,
     PageSectionComponent,
     StatusPanelComponent,
@@ -35,81 +33,90 @@ import { IngestionJob } from '../../domain/entities/IngestionJob';
       title="Source file"
       description="Select one PDF document from your exam syllabus to begin."
     >
-      <opo-card>
-        <opo-upload-dropzone
-          label="Upload source"
-          description="Only PDF files are supported in the initial MVP."
-          accept=".pdf"
-          (fileSelected)="onFileSelected($event)"
-        />
-      </opo-card>
+      <mat-card>
+        <mat-card-content>
+          <opo-upload-dropzone
+            label="Upload source"
+            description="Only PDF files are supported in the initial MVP."
+            accept=".pdf"
+            (fileSelected)="onFileSelected($event)"
+          />
+        </mat-card-content>
+      </mat-card>
     </opo-page-section>
 
     @if (store.validationMessage(); as message) {
-      <opo-alert tone="error">{{ message }}</opo-alert>
+      <div role="alert" class="validation-error">{{ message }}</div>
     }
 
     @if (store.selectedSource(); as source) {
       <p class="selected-source">
-        Selected: <opo-badge tone="info">{{ source.name }}</opo-badge>
+        Selected: <mat-chip>{{ source.name }}</mat-chip>
       </p>
     }
 
-    <opo-button type="button" [disabled]="!store.selectedSource()" (pressed)="onStartIngestion()">
+    <button
+      mat-button
+      type="button"
+      [disabled]="!store.selectedSource()"
+      (click)="onStartIngestion()"
+    >
       Start ingestion
-    </opo-button>
+    </button>
 
     @if (store.ingestionJob(); as job) {
       <opo-status-panel [tone]="toneFor(job)" [title]="titleFor(job)" [message]="messageFor(job)">
         @if (job.status === ingestionStatus.ERROR) {
-          <opo-button type="button" data-testid="retry-ingestion" (pressed)="onStartIngestion()">
+          <button
+            mat-button
+            type="button"
+            data-testid="retry-ingestion"
+            (click)="onStartIngestion()"
+          >
             Try again
-          </opo-button>
+          </button>
         }
       </opo-status-panel>
     }
 
     @if (store.ingestionJob()?.status === ingestionStatus.DONE) {
       <opo-page-section title="Study actions" description="These features will be available soon.">
-        <opo-card variant="muted">
-          <ul class="future-actions">
-            <li>
-              <opo-button type="button" variant="ghost" [disabled]="true" data-testid="action-chat">
-                Chat with sources
-              </opo-button>
-            </li>
-            <li>
-              <opo-button
-                type="button"
-                variant="ghost"
-                [disabled]="true"
-                data-testid="action-summary"
-              >
-                Summaries by topic
-              </opo-button>
-            </li>
-            <li>
-              <opo-button type="button" variant="ghost" [disabled]="true" data-testid="action-test">
-                Automatic tests
-              </opo-button>
-            </li>
-            <li>
-              <opo-button type="button" variant="ghost" [disabled]="true" data-testid="action-plan">
-                Adaptive plan
-              </opo-button>
-            </li>
-            <li>
-              <opo-button
-                type="button"
-                variant="ghost"
-                [disabled]="true"
-                data-testid="action-recommendations"
-              >
-                Recommendations
-              </opo-button>
-            </li>
-          </ul>
-        </opo-card>
+        <mat-card>
+          <mat-card-content>
+            <ul class="future-actions">
+              <li>
+                <button mat-button type="button" [disabled]="true" data-testid="action-chat">
+                  Chat with sources
+                </button>
+              </li>
+              <li>
+                <button mat-button type="button" [disabled]="true" data-testid="action-summary">
+                  Summaries by topic
+                </button>
+              </li>
+              <li>
+                <button mat-button type="button" [disabled]="true" data-testid="action-test">
+                  Automatic tests
+                </button>
+              </li>
+              <li>
+                <button mat-button type="button" [disabled]="true" data-testid="action-plan">
+                  Adaptive plan
+                </button>
+              </li>
+              <li>
+                <button
+                  mat-button
+                  type="button"
+                  [disabled]="true"
+                  data-testid="action-recommendations"
+                >
+                  Recommendations
+                </button>
+              </li>
+            </ul>
+          </mat-card-content>
+        </mat-card>
       </opo-page-section>
     }
   `,

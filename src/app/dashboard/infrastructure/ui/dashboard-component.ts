@@ -1,5 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { SideNavigationComponent } from './side-navigation/side-navigation.component';
 
 @Component({
@@ -9,28 +11,28 @@ import { SideNavigationComponent } from './side-navigation/side-navigation.compo
     '(document:click)': 'closeSideMenuOnBackdropClick($event)',
     '(document:keydown.escape)': 'closeSideMenuOnEscape()',
   },
-  imports: [RouterOutlet, SideNavigationComponent],
+  imports: [RouterOutlet, MatButtonModule, MatIconModule, SideNavigationComponent],
   template: `
     <header class="dashboard-header" aria-label="Application header">
       <div class="dashboard-header-left">
         <button
-          class="burger-menu-button"
+          mat-icon-button
           type="button"
           [attr.aria-label]="isSideMenuOpen() ? 'Close menu' : 'Open menu'"
           [attr.aria-expanded]="isSideMenuOpen()"
           aria-controls="side-menu"
           (click)="toggleSideMenu()"
         >
-          <span class="burger-menu-icon" aria-hidden="true">☰</span>
+          <mat-icon>menu</mat-icon>
         </button>
         <span class="dashboard-brand" aria-hidden="true">Opositaria</span>
       </div>
       <div class="dashboard-header-right">
-        <button class="dashboard-utility-button" type="button" aria-label="Notifications">
-          <span aria-hidden="true">🔔</span>
+        <button mat-icon-button type="button" aria-label="Notifications">
+          <mat-icon>notifications</mat-icon>
         </button>
-        <button class="dashboard-utility-button" type="button" aria-label="Profile">
-          <span aria-hidden="true">👤</span>
+        <button mat-icon-button type="button" aria-label="Profile">
+          <mat-icon>person</mat-icon>
         </button>
       </div>
     </header>

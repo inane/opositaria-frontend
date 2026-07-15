@@ -36,7 +36,9 @@ test.describe('The dashboard home shell', () => {
     await expect(sideMenu).not.toBeVisible();
   });
 
-  test('expands and collapses the desktop navigation rail with the burger button', async ({ page }) => {
+  test('expands and collapses the desktop navigation rail with the burger button', async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
     await page.goto('/dashboard');
     const sideMenu = page.getByRole('navigation', { name: 'Side menu' });

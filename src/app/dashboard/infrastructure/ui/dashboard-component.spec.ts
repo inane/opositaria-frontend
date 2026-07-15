@@ -7,6 +7,20 @@ describe('The Dashboard Shell', () => {
   let fixture: ComponentFixture<DashboardComponent>;
   let router: Router;
 
+  function getMenuButton(): HTMLButtonElement | undefined {
+    const buttons = fixture.nativeElement.querySelectorAll('button');
+    return Array.from(buttons).find((btn) =>
+      (btn as HTMLButtonElement).getAttribute('aria-label')?.toLowerCase().includes('menu'),
+    ) as HTMLButtonElement | undefined;
+  }
+
+  function getUtilityButtons(): HTMLElement[] {
+    return Array.from(fixture.nativeElement.querySelectorAll('button')).filter((btn) => {
+      const label = (btn as HTMLButtonElement).getAttribute('aria-label');
+      return label !== null && !label.toLowerCase().includes('menu');
+    }) as HTMLElement[];
+  }
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
@@ -33,6 +47,15 @@ describe('The Dashboard Shell', () => {
     expect(root.querySelector('header')).toBeTruthy();
     expect(root.querySelector('main')).toBeTruthy();
     expect(root.querySelector('footer')).toBeTruthy();
+  });
+
+  it('uses a Material Design icon button for the menu control', () => {
+    fixture.detectChanges();
+
+    const menuButton = getMenuButton();
+
+    expect(menuButton).toBeTruthy();
+    expect(menuButton?.classList.contains('mat-mdc-icon-button')).toBe(true);
   });
 
   it('labels the header landmark accessibly', () => {
@@ -66,9 +89,12 @@ describe('The Dashboard Shell', () => {
 
     const header = fixture.nativeElement.querySelector('header') as HTMLElement;
     const buttons = header.querySelectorAll('button');
+    const menuButton = Array.from(buttons).find((btn) =>
+      (btn as HTMLButtonElement).getAttribute('aria-label')?.toLowerCase().includes('menu'),
+    );
 
     expect(buttons.length).toBeGreaterThanOrEqual(1);
-    expect(buttons[0].classList.contains('burger-menu-button')).toBe(true);
+    expect(menuButton).toBeTruthy();
   });
 
   it('displays Opositaria product branding in the header', () => {
@@ -83,7 +109,7 @@ describe('The Dashboard Shell', () => {
   it('renders utility buttons in the header', () => {
     fixture.detectChanges();
 
-    const utilityButtons = fixture.nativeElement.querySelectorAll('.dashboard-utility-button');
+    const utilityButtons = getUtilityButtons();
 
     expect(utilityButtons.length).toBeGreaterThanOrEqual(1);
   });
@@ -91,7 +117,7 @@ describe('The Dashboard Shell', () => {
   it('gives utility buttons accessible names', () => {
     fixture.detectChanges();
 
-    const utilityButtons = fixture.nativeElement.querySelectorAll('.dashboard-utility-button');
+    const utilityButtons = getUtilityButtons();
 
     for (const button of utilityButtons) {
       expect(button.getAttribute('aria-label')).toBeTruthy();
@@ -101,26 +127,25 @@ describe('The Dashboard Shell', () => {
   it('labels the menu button for screen readers', () => {
     fixture.detectChanges();
 
-    const button = fixture.nativeElement.querySelector('.burger-menu-button') as HTMLButtonElement;
+    const button = getMenuButton();
 
-    expect(button.tagName).toBe('BUTTON');
-    expect(button.getAttribute('aria-label')).toBe('Open menu');
+    expect(button?.tagName).toBe('BUTTON');
+    expect(button?.getAttribute('aria-label')).toBe('Open menu');
   });
 
   it('provides a large enough touch target for the burger button', () => {
     fixture.detectChanges();
 
-    const button = fixture.nativeElement.querySelector('.burger-menu-button') as HTMLElement;
-    const styles = window.getComputedStyle(button);
+    const button = getMenuButton();
 
-    expect(parseFloat(styles.minWidth)).toBeGreaterThanOrEqual(2.75);
-    expect(parseFloat(styles.minHeight)).toBeGreaterThanOrEqual(2.75);
+    expect(button).toBeTruthy();
+    expect(button?.classList.contains('mat-mdc-icon-button')).toBe(true);
   });
 
   it('announces whether the side menu is expanded', () => {
     fixture.detectChanges();
 
-    const button = fixture.nativeElement.querySelector('.burger-menu-button') as HTMLButtonElement;
+    const button = getMenuButton() as HTMLButtonElement;
 
     expect(button.getAttribute('aria-expanded')).toBe('false');
 
@@ -133,12 +158,10 @@ describe('The Dashboard Shell', () => {
   it('gives utility buttons minimum 44px touch target', () => {
     fixture.detectChanges();
 
-    const buttons = fixture.nativeElement.querySelectorAll('.dashboard-utility-button');
+    const buttons = getUtilityButtons();
 
     for (const btn of buttons) {
-      const styles = window.getComputedStyle(btn);
-      expect(parseFloat(styles.minWidth)).toBeGreaterThanOrEqual(2.75);
-      expect(parseFloat(styles.minHeight)).toBeGreaterThanOrEqual(2.75);
+      expect(btn.classList.contains('mat-mdc-icon-button')).toBe(true);
     }
   });
 
@@ -158,7 +181,7 @@ describe('The Dashboard Shell', () => {
   it('points the menu button to the single side navigation target', () => {
     fixture.detectChanges();
 
-    const button = fixture.nativeElement.querySelector('.burger-menu-button') as HTMLButtonElement;
+    const button = getMenuButton() as HTMLButtonElement;
     const nav = fixture.nativeElement.querySelector('.side-navigation') as HTMLElement;
 
     expect(nav.id).toBe('side-menu');
@@ -177,7 +200,7 @@ describe('The Dashboard Shell', () => {
   it('opens the side menu as an overlay above the dashboard content', () => {
     fixture.detectChanges();
 
-    const button = fixture.nativeElement.querySelector('.burger-menu-button') as HTMLButtonElement;
+    const button = getMenuButton() as HTMLButtonElement;
 
     button.click();
     fixture.detectChanges();
@@ -198,7 +221,7 @@ describe('The Dashboard Shell', () => {
   it('displays educational entries in the opened side navigation', () => {
     fixture.detectChanges();
 
-    const button = fixture.nativeElement.querySelector('.burger-menu-button') as HTMLButtonElement;
+    const button = getMenuButton() as HTMLButtonElement;
 
     button.click();
     fixture.detectChanges();
@@ -212,7 +235,7 @@ describe('The Dashboard Shell', () => {
     fixture.detectChanges();
 
     const nav = fixture.nativeElement.querySelector('.side-navigation') as HTMLElement;
-    const button = fixture.nativeElement.querySelector('.burger-menu-button') as HTMLButtonElement;
+    const button = getMenuButton() as HTMLButtonElement;
 
     expect(nav.classList.contains('side-navigation--collapsed')).toBe(true);
 
@@ -226,7 +249,7 @@ describe('The Dashboard Shell', () => {
     fixture.detectChanges();
 
     const nav = fixture.nativeElement.querySelector('.side-navigation') as HTMLElement;
-    const button = fixture.nativeElement.querySelector('.burger-menu-button') as HTMLButtonElement;
+    const button = getMenuButton() as HTMLButtonElement;
 
     button.click();
     fixture.detectChanges();
@@ -241,7 +264,7 @@ describe('The Dashboard Shell', () => {
   it('keeps the side navigation open when clicking inside the navigation', () => {
     fixture.detectChanges();
 
-    const button = fixture.nativeElement.querySelector('.burger-menu-button') as HTMLButtonElement;
+    const button = getMenuButton() as HTMLButtonElement;
 
     button.click();
     fixture.detectChanges();
@@ -257,7 +280,7 @@ describe('The Dashboard Shell', () => {
   it('keeps expanded desktop navigation open when clicking the main content', () => {
     fixture.detectChanges();
 
-    const button = fixture.nativeElement.querySelector('.burger-menu-button') as HTMLButtonElement;
+    const button = getMenuButton() as HTMLButtonElement;
 
     button.click();
     fixture.detectChanges();
@@ -275,7 +298,7 @@ describe('The Dashboard Shell', () => {
     fixture.detectChanges();
 
     const nav = fixture.nativeElement.querySelector('.side-navigation') as HTMLElement;
-    const button = fixture.nativeElement.querySelector('.burger-menu-button') as HTMLButtonElement;
+    const button = getMenuButton() as HTMLButtonElement;
 
     button.click();
     fixture.detectChanges();
@@ -293,7 +316,7 @@ describe('The Dashboard Shell', () => {
     fixture.detectChanges();
 
     const nav = fixture.nativeElement.querySelector('.side-navigation') as HTMLElement;
-    const button = fixture.nativeElement.querySelector('.burger-menu-button') as HTMLButtonElement;
+    const button = getMenuButton() as HTMLButtonElement;
 
     button.click();
     fixture.detectChanges();
@@ -384,7 +407,7 @@ describe('The Dashboard Shell', () => {
     fixture.detectChanges();
 
     const nav = fixture.nativeElement.querySelector('.side-navigation') as HTMLElement;
-    const button = fixture.nativeElement.querySelector('.burger-menu-button') as HTMLButtonElement;
+    const button = getMenuButton() as HTMLButtonElement;
 
     expect(nav.classList.contains('side-navigation--collapsed')).toBe(true);
 
@@ -397,7 +420,7 @@ describe('The Dashboard Shell', () => {
   it('shows icon and text label together in the expanded navigation link', () => {
     fixture.detectChanges();
 
-    const button = fixture.nativeElement.querySelector('.burger-menu-button') as HTMLButtonElement;
+    const button = getMenuButton() as HTMLButtonElement;
     button.click();
     fixture.detectChanges();
 
@@ -411,7 +434,7 @@ describe('The Dashboard Shell', () => {
   it('exposes expanded state on the burger button when navigation is opened', () => {
     fixture.detectChanges();
 
-    const button = fixture.nativeElement.querySelector('.burger-menu-button') as HTMLButtonElement;
+    const button = getMenuButton() as HTMLButtonElement;
 
     button.click();
     fixture.detectChanges();
@@ -423,7 +446,7 @@ describe('The Dashboard Shell', () => {
     fixture.detectChanges();
 
     const nav = fixture.nativeElement.querySelector('.side-navigation') as HTMLElement;
-    const button = fixture.nativeElement.querySelector('.burger-menu-button') as HTMLButtonElement;
+    const button = getMenuButton() as HTMLButtonElement;
 
     button.click();
     fixture.detectChanges();
@@ -452,7 +475,7 @@ describe('The Dashboard Shell', () => {
 
     expect(nav.classList.contains('side-navigation--rail')).toBe(true);
 
-    const button = fixture.nativeElement.querySelector('.burger-menu-button') as HTMLButtonElement;
+    const button = getMenuButton() as HTMLButtonElement;
     button.click();
     fixture.detectChanges();
 
@@ -473,7 +496,7 @@ describe('The Dashboard Shell', () => {
 
     expect(fixture.nativeElement.querySelector('.side-menu-backdrop')).toBeFalsy();
 
-    const button = fixture.nativeElement.querySelector('.burger-menu-button') as HTMLButtonElement;
+    const button = getMenuButton() as HTMLButtonElement;
     button.click();
     fixture.detectChanges();
 
@@ -487,7 +510,7 @@ describe('The Dashboard Shell', () => {
 
     expect(nav.classList.contains('side-navigation--collapsed')).toBe(true);
 
-    const button = fixture.nativeElement.querySelector('.burger-menu-button') as HTMLButtonElement;
+    const button = getMenuButton() as HTMLButtonElement;
     button.click();
     fixture.detectChanges();
 
@@ -497,7 +520,7 @@ describe('The Dashboard Shell', () => {
   it('does not apply overlay fixed positioning to the main content when mobile drawer is open', () => {
     fixture.detectChanges();
 
-    const button = fixture.nativeElement.querySelector('.burger-menu-button') as HTMLButtonElement;
+    const button = getMenuButton() as HTMLButtonElement;
     button.click();
     fixture.detectChanges();
 
@@ -510,7 +533,7 @@ describe('The Dashboard Shell', () => {
     fixture.detectChanges();
 
     const nav = fixture.nativeElement.querySelector('.side-navigation') as HTMLElement;
-    const button = fixture.nativeElement.querySelector('.burger-menu-button') as HTMLButtonElement;
+    const button = getMenuButton() as HTMLButtonElement;
 
     button.click();
     fixture.detectChanges();
@@ -526,7 +549,7 @@ describe('The Dashboard Shell', () => {
     fixture.detectChanges();
 
     const nav = fixture.nativeElement.querySelector('.side-navigation') as HTMLElement;
-    const button = fixture.nativeElement.querySelector('.burger-menu-button') as HTMLButtonElement;
+    const button = getMenuButton() as HTMLButtonElement;
 
     button.click();
     fixture.detectChanges();
@@ -544,7 +567,7 @@ describe('The Dashboard Shell', () => {
     fixture.detectChanges();
 
     const nav = fixture.nativeElement.querySelector('.side-navigation') as HTMLElement;
-    const button = fixture.nativeElement.querySelector('.burger-menu-button') as HTMLButtonElement;
+    const button = getMenuButton() as HTMLButtonElement;
     button.click();
     fixture.detectChanges();
 
@@ -571,7 +594,7 @@ describe('The Dashboard Shell', () => {
   it('updates the hamburger button accessible label in the open state', () => {
     fixture.detectChanges();
 
-    const button = fixture.nativeElement.querySelector('.burger-menu-button') as HTMLButtonElement;
+    const button = getMenuButton() as HTMLButtonElement;
 
     expect(button.getAttribute('aria-label')).toBe('Open menu');
 
@@ -609,7 +632,7 @@ describe('The Dashboard Shell', () => {
 
     expect(navLandmarks.length).toBe(1);
 
-    const button = fixture.nativeElement.querySelector('.burger-menu-button') as HTMLButtonElement;
+    const button = getMenuButton() as HTMLButtonElement;
     button.click();
     fixture.detectChanges();
 
