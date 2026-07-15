@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { routes } from './app.routes';
-import { DashboardComponent } from './dashboard/infrastructure/ui/dashboard-component';
+import { StudySpacesDashboardComponent } from './dashboard/infrastructure/ui/study-spaces-dashboard.component';
 import { SOURCE_INGESTION_PORT } from './source-ingestion/infrastructure/tokens/source-ingestion-port.token';
 import { FakeSourceIngestionAdapter } from './source-ingestion/infrastructure/adapters/FakeSourceIngestionAdapter';
 
@@ -40,12 +40,12 @@ describe('The application routes', () => {
   it('renders the dashboard home shell at /dashboard', async () => {
     const harness = await RouterTestingHarness.create();
 
-    await harness.navigateByUrl('/dashboard', DashboardComponent);
+    await harness.navigateByUrl('/dashboard', StudySpacesDashboardComponent);
 
     const root = harness.fixture.nativeElement as HTMLElement;
 
     expect(root.querySelector('header')).toBeTruthy();
     expect(root.querySelector('main')).toBeTruthy();
-    expect(root.querySelector('footer')).toBeTruthy();
+    expect(root.querySelector('.study-spaces-dashboard')).toBeTruthy();
   });
 });
