@@ -1,9 +1,10 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { DashboardStore } from './dashboard-store.service';
-import { InMemoryStudySpaceRepository } from '../../domain/repositories/StudySpaceRepository';
+import { InMemoryStudySpaceRepository, StudySpaceRepository } from '../../domain/repositories/StudySpaceRepository';
 import { ListStudySpacesUseCase } from '../../application/ListStudySpacesUseCase';
 import { SaveStudySpaceUseCase } from '../../application/SaveStudySpaceUseCase';
 import { StudySpace } from '../../domain/entities/StudySpace';
+import { DomainError } from '../../domain/entities/DomainError';
 
 function createSpace(title: string, overrides: Partial<{ isOwned: boolean; isFeatured: boolean; sourceCount: number }> = {}): StudySpace {
   return StudySpace.create({
@@ -135,7 +136,7 @@ describe('The DashboardStore', () => {
     store.openCreateFlow();
     store.recordUploadedSources(3);
 
-    expect(store.pendingSaveState()).toEqual({ uploadedSourceCount: 3 });
+    expect(store.pendingSaveState()).toEqual({ uploadedSourceCount: 3, documentIds: [] });
   });
 
   it('saves a named pending study space and refreshes visible spaces', async () => {
@@ -183,5 +184,25 @@ describe('The DashboardStore', () => {
 
     expect(store.isCreateFlowOpen()).toBe(false);
     expect(store.pendingSaveState()).toBeNull();
+  });
+
+  it('keeps the create flow open when the backend rejects with document_not_ready', async () => {
+    const repository = new InMemoryStudySpaceRepository();
+    // Override createStudySpace to throw a not-ready error
+    repository.createStudySpace = vi.fn().mockRejectedValue(
+      DomainError.createValidation('Document is not ready yet.'),
+    );
+    const store = new DashboardStore(
+      new ListStudySpacesUseCase(repository),
+      new SaveStudySpaceUseCase(repository),
+    );
+
+    store.openCreateFlow();
+    store.recordUploadedSources(1, ['doc-123']);
+    await store.savePendingSpace('Test Space');
+
+    // Create flow remains open so the user can retry
+    expect(store.isCreateFlowOpen()).toBe(true);
+    expect(store.pendingSaveState()).not.toBeNull();
   });
 });

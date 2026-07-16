@@ -1,8 +1,16 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, beforeEach } from 'vitest';
+import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { dashboardRoutes } from './dashboard.routes';
 import { StudySpacesDashboardComponent } from './infrastructure/ui/study-spaces-dashboard.component';
 
 describe('The dashboard routes', () => {
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+    });
+  });
+
   it('renders the study-spaces dashboard as the dashboard home', () => {
     const homeRoute = dashboardRoutes[0];
 

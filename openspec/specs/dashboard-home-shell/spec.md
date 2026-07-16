@@ -1,6 +1,6 @@
 ## Purpose
 
-The dashboard home shell provides the main layout shell for the `/dashboard` route. It renders a header with a burger menu control, a main content area that hosts the source ingestion experience, and a footer reserved area. It manages a single responsive side navigation that behaves as a desktop rail/expanded panel on viewports at or above `1024px` and as a mobile offcanvas overlay below `1024px`.
+The dashboard home shell provides the main layout shell for the `/dashboard` route. It renders a header with a burger menu control, a main content area that hosts the create-study-space flow (including source ingestion), and a footer reserved area. It manages a single responsive side navigation that behaves as a desktop rail/expanded panel on viewports at or above `1024px` and as a mobile offcanvas overlay below `1024px`.
 
 ## Requirements
 
@@ -19,10 +19,10 @@ The system SHALL redirect users who navigate to the root route `/` based on acce
 - **AND** the dashboard home shell is displayed
 
 ### Requirement: Dashboard route renders the home shell
-The system SHALL render the dashboard home shell when a user navigates to `/dashboard`.
+The system SHALL render the dashboard home shell when an authenticated user navigates to `/dashboard`.
 
 #### Scenario: User opens dashboard route
-- **GIVEN** a user is in the frontend application
+- **GIVEN** an authenticated user is in the frontend application
 - **WHEN** the user navigates to `/dashboard`
 - **THEN** the application displays a dashboard shell
 - **AND** the shell contains a header area
@@ -30,18 +30,18 @@ The system SHALL render the dashboard home shell when a user navigates to `/dash
 - **AND** the shell contains a footer reserved area
 
 ### Requirement: Dashboard main content hosts source ingestion
-The dashboard home shell SHALL render the existing source ingestion experience inside its main content area.
+The dashboard home shell SHALL render the source ingestion experience inside its create-study-space flow.
 
-#### Scenario: User opens dashboard and sees source ingestion
-- **GIVEN** a user is in the frontend application
-- **WHEN** the user navigates to `/dashboard`
-- **THEN** the dashboard main content displays the source ingestion experience
-- **AND** the source ingestion upload UI keeps its existing title, source file section, upload control, and start ingestion action
+#### Scenario: User opens create study space flow
+- **GIVEN** an authenticated user is viewing `/dashboard`
+- **WHEN** the user activates the create-new study-space action
+- **THEN** the dashboard main content displays the source ingestion upload UI
+- **AND** the upload UI keeps its source file section, upload control, and start ingestion action
 
 #### Scenario: Source ingestion behavior remains unchanged in dashboard
-- **GIVEN** a user is viewing `/dashboard`
+- **GIVEN** an authenticated user is creating a study space from `/dashboard`
 - **WHEN** the user interacts with the source ingestion upload flow
-- **THEN** the source ingestion validation, selected source display, start ingestion action, and status feedback behave as defined by the existing source ingestion module
+- **THEN** source validation, selected source display, start ingestion action, automatic status feedback, and retry behavior behave as defined by the source ingestion module
 
 ### Requirement: Source ingestion has no standalone route
 The system SHALL NOT expose `/source-ingestion` as a standalone application route while source ingestion is hosted by the dashboard.
@@ -330,3 +330,57 @@ The system SHALL prevent unauthenticated users from accessing the dashboard rout
 - **GIVEN** an access token exists in browser storage
 - **WHEN** the user navigates to `/dashboard`
 - **THEN** the system displays the dashboard
+
+### Requirement: Dashboard lists backend study spaces
+The dashboard SHALL list study spaces returned by the backend for the authenticated user.
+
+#### Scenario: Authenticated user opens dashboard with study spaces
+- **GIVEN** the authenticated user owns study spaces
+- **WHEN** the user opens `/dashboard`
+- **THEN** the dashboard requests `GET /study-spaces`
+- **AND** the dashboard displays one card for each returned study space
+- **AND** each card displays the study-space name and document count
+
+#### Scenario: Authenticated user has no study spaces
+- **GIVEN** the authenticated user owns no study spaces
+- **WHEN** the user opens `/dashboard`
+- **THEN** the dashboard displays the empty state
+- **AND** the dashboard offers the create-new study-space action
+
+#### Scenario: Backend fails while loading study spaces
+- **GIVEN** the authenticated user opens `/dashboard`
+- **WHEN** `GET /study-spaces` fails with a recoverable server error
+- **THEN** the dashboard displays an accessible error message
+- **AND** the dashboard offers a retry action
+
+### Requirement: Dashboard creates study spaces after document ingestion
+The dashboard SHALL create a backend study space only after a processed document is named by the user.
+
+#### Scenario: User saves a named study space after document is ready
+- **GIVEN** an authenticated user has uploaded a PDF
+- **AND** the document status is ready
+- **AND** the user enters a non-blank study-space name
+- **WHEN** the user saves the study space
+- **THEN** the dashboard sends `POST /study-spaces`
+- **AND** the request contains the entered name
+- **AND** the request contains the ready document identifier
+- **AND** the created study space appears in the dashboard list
+
+#### Scenario: User attempts to save a blank study-space name
+- **GIVEN** an authenticated user has a ready uploaded document
+- **WHEN** the user attempts to save a blank study-space name
+- **THEN** the dashboard prevents the request
+- **AND** the dashboard displays a validation message
+
+#### Scenario: Backend rejects study-space creation because the document is not ready
+- **GIVEN** an authenticated user has uploaded a PDF
+- **AND** the backend still considers the document not ready
+- **WHEN** the user saves the study space
+- **THEN** the dashboard displays a recoverable creation error
+- **AND** the dashboard keeps the create flow open
+
+#### Scenario: User cancels study-space creation
+- **GIVEN** an authenticated user is in the create study space flow
+- **WHEN** the user cancels creation
+- **THEN** the dashboard stops any pending polling
+- **AND** the dashboard returns to the study-space list without creating a study space

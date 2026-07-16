@@ -4,12 +4,18 @@ import { StudySpaceRepository } from '../domain/repositories/StudySpaceRepositor
 export interface SaveStudySpaceRequest {
   name: string;
   uploadedSourceCount: number;
+  documentIds?: string[];
 }
 
 export class SaveStudySpaceUseCase {
   constructor(private readonly repository: StudySpaceRepository) {}
 
   async execute(request: SaveStudySpaceRequest): Promise<void> {
+    if (this.repository.createStudySpace && request.documentIds && request.documentIds.length > 0) {
+      await this.repository.createStudySpace(request.name, request.documentIds);
+      return;
+    }
+
     const space = StudySpace.create({
       title: request.name,
       isOwned: true,

@@ -11,6 +11,15 @@ describe('The SourceFile', () => {
     expect(sourceFile.type).toBe('application/pdf');
   });
 
+  it('preserves the selected PDF file content', () => {
+    const file = new File(['real pdf bytes'], 'exam.pdf', { type: 'application/pdf' });
+
+    const sourceFile = SourceFile.create(file);
+
+    expect(sourceFile.content).toBe(file);
+    expect(sourceFile.content.size).toBe(file.size);
+  });
+
   it('rejects a non-PDF file metadata', () => {
     const file = { name: 'exam.txt', size: 1024, type: 'text/plain' };
 

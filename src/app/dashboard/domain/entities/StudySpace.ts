@@ -7,6 +7,8 @@ export interface StudySpaceCreationParams {
   isOwned: boolean;
   isFeatured: boolean;
   sourceCount: number;
+  id?: string;
+  createdAt?: Date;
 }
 
 export class StudySpace {
@@ -29,12 +31,12 @@ export class StudySpace {
     }
 
     return new StudySpace(
-      crypto.randomUUID(),
+      params.id ?? crypto.randomUUID(),
       params.title,
       params.isOwned,
       params.isFeatured,
       params.sourceCount,
-      new Date(),
+      params.createdAt ?? new Date(),
     );
   }
 

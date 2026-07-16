@@ -6,7 +6,7 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { routes } from './app.routes';
 import { SOURCE_INGESTION_PORT } from './source-ingestion/infrastructure/tokens/source-ingestion-port.token';
-import { FakeSourceIngestionAdapter } from './source-ingestion/infrastructure/adapters/FakeSourceIngestionAdapter';
+import { HttpSourceIngestionAdapter } from './source-ingestion/infrastructure/adapters/HttpSourceIngestionAdapter';
 import { AuthGuard } from './auth/infrastructure/adapters/AuthGuard';
 import { AuthInterceptor } from './auth/infrastructure/adapters/AuthInterceptor';
 import { TokenStorageService } from './auth/infrastructure/adapters/TokenStorageService';
@@ -17,7 +17,7 @@ export const appConfig: ApplicationConfig = {
     provideNoopAnimations(),
     provideHttpClient(withInterceptorsFromDi()),
     provideRouter(routes),
-    { provide: SOURCE_INGESTION_PORT, useClass: FakeSourceIngestionAdapter },
+    { provide: SOURCE_INGESTION_PORT, useClass: HttpSourceIngestionAdapter },
     AuthGuard,
     TokenStorageService,
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },

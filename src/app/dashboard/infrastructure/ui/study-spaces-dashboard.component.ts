@@ -1,9 +1,10 @@
 import { Component, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { DashboardStore } from '../store/dashboard-store.service';
 import { StudySpace } from '../../domain/entities/StudySpace';
-import { LocalStudySpaceRepository } from '../adapters/LocalStudySpaceRepository';
+import { HttpStudySpaceAdapter } from '../adapters/HttpStudySpaceAdapter';
 import { ListStudySpacesUseCase } from '../../application/ListStudySpacesUseCase';
 import { SaveStudySpaceUseCase } from '../../application/SaveStudySpaceUseCase';
 import { SourceIngestionComponent } from '../../../source-ingestion/infrastructure/ui/source-ingestion.component';
@@ -104,7 +105,7 @@ import { SourceIngestionComponent } from '../../../source-ingestion/infrastructu
               </div>
             </section>
           } @else {
-            <app-source-ingestion (sourceIngested)="store.recordUploadedSources($event.sourceCount)" />
+            <app-source-ingestion (sourceIngested)="store.recordUploadedSources($event.sourceCount, $event.documentIds)" />
             <button mat-button type="button" (click)="store.cancelCreation()">Cancel creation</button>
           }
         } @else if (emptyStateMessage; as message) {
@@ -358,10 +359,11 @@ import { SourceIngestionComponent } from '../../../source-ingestion/infrastructu
   `],
 })
 export class StudySpacesDashboardComponent {
+  private readonly http = inject(HttpClient);
   readonly store: DashboardStore;
 
   constructor() {
-    const repository = new LocalStudySpaceRepository(StudySpacesDashboardComponent.seedSpaces);
+    const repository = new HttpStudySpaceAdapter(this.http);
     this.store = new DashboardStore(
       new ListStudySpacesUseCase(repository),
       new SaveStudySpaceUseCase(repository),
@@ -371,6 +373,4 @@ export class StudySpacesDashboardComponent {
 
   protected get emptyStateMessage() { return this.store.emptyStateReason(); }
   protected get activeFilter() { return this.store.activeFilter(); }
-
-  static readonly seedSpaces: StudySpace[] = [];
 }

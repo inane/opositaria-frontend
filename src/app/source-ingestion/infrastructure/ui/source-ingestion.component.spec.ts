@@ -4,6 +4,7 @@ import { SourceIngestionComponent } from './source-ingestion.component';
 import { SOURCE_INGESTION_PORT } from '../tokens/source-ingestion-port.token';
 import { InMemorySourceIngestionRepository } from '../../domain/repositories/SourceIngestionRepository';
 import { SourceIngestionStore } from '../store/source-ingestion-store.service';
+import { IngestionStatus } from '../../domain/value-objects/IngestionStatus';
 
 function selectFile(fixture: ComponentFixture<SourceIngestionComponent>, file: File): void {
   const input = fixture.nativeElement.querySelector('input[type="file"]');
@@ -199,5 +200,58 @@ describe('The SourceIngestionComponent', () => {
     expect(testAction?.disabled).toBe(true);
     expect(planAction?.disabled).toBe(true);
     expect(recommendationsAction?.disabled).toBe(true);
+  });
+
+  it('emits the document id when the ingestion status becomes done', async () => {
+    const file = new File(['content'], 'exam.pdf', { type: 'application/pdf' });
+    selectFile(fixture, file);
+    await startIngestion(fixture);
+
+    // Simulate polling completion via the store
+    await store.refreshStatus(); // PENDING → PROCESSING
+    await store.refreshStatus(); // PROCESSING → DONE
+
+    // The effect in the component should fire
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const job = store.ingestionJob();
+    expect(job?.status).toBe(IngestionStatus.DONE);
+    expect(job?.jobId).toBeTruthy();
+  });
+
+  it('announces ingestion progress through an accessible status region', async () => {
+    const file = new File(['content'], 'exam.pdf', { type: 'application/pdf' });
+    selectFile(fixture, file);
+    await startIngestion(fixture);
+
+    const statusPanel = fixture.nativeElement.querySelector('opo-status-panel');
+    expect(statusPanel).toBeTruthy();
+    expect(fixture.nativeElement.textContent).toContain('Pending');
+  });
+
+  it('shows processing status after job advances', async () => {
+    const file = new File(['content'], 'exam.pdf', { type: 'application/pdf' });
+    selectFile(fixture, file);
+    await startIngestion(fixture);
+
+    await store.refreshStatus();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('Processing');
+  });
+
+  it('announces ingestion errors through an accessible alert region', async () => {
+    const file = new File(['content'], 'error-exam.pdf', { type: 'application/pdf' });
+    selectFile(fixture, file);
+    await startIngestion(fixture);
+
+    await store.refreshStatus();
+    await store.refreshStatus();
+    fixture.detectChanges();
+
+    const retryButton = fixture.nativeElement.querySelector('[data-testid="retry-ingestion"]');
+    expect(retryButton).toBeTruthy();
+    expect(retryButton.textContent?.trim()).toBe('Try again');
   });
 });

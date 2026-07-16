@@ -11,6 +11,14 @@ export class IngestionJob {
     return new IngestionJob(jobId, IngestionStatus.PENDING);
   }
 
+  static fromBackend(
+    documentId: string,
+    status: IngestionStatus,
+    recoveryMessage = '',
+  ): IngestionJob {
+    return new IngestionJob(documentId, status, recoveryMessage);
+  }
+
   startProcessing(): IngestionJob {
     return new IngestionJob(this.jobId, IngestionStatus.PROCESSING);
   }

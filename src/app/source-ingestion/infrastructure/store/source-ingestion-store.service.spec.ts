@@ -35,6 +35,15 @@ describe('The SourceIngestionStore', () => {
     expect(store.validationMessage()).toBe('');
   });
 
+  it('keeps the selected PDF file content for upload', () => {
+    const store = TestBed.inject(SourceIngestionStore);
+    const file = new File(['real pdf bytes'], 'exam.pdf', { type: 'application/pdf' });
+
+    store.selectSource(file);
+
+    expect(store.selectedSource()?.content).toBe(file);
+  });
+
   it('rejects a selected non-PDF file and shows a validation message', () => {
     const store = TestBed.inject(SourceIngestionStore);
     const file = new File(['content'], 'exam.txt', { type: 'text/plain' });

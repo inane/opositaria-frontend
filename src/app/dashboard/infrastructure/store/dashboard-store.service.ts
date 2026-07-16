@@ -5,6 +5,7 @@ import { StudySpace, StudySpaceFilter } from '../../domain/entities/StudySpace';
 
 export interface PendingSaveState {
   uploadedSourceCount: number;
+  documentIds: string[];
 }
 
 export class DashboardStore {
@@ -50,8 +51,13 @@ export class DashboardStore {
   ) {}
 
   async init(): Promise<void> {
-    const spaces = await this.listUseCase.execute({});
-    this.rawSpaces.set(spaces);
+    try {
+      const spaces = await this.listUseCase.execute({});
+      this.rawSpaces.set(spaces);
+    } catch {
+      // Backend unavailable - show empty state
+      this.rawSpaces.set([]);
+    }
   }
 
   setFilter(filter: StudySpaceFilter): void {
@@ -74,8 +80,8 @@ export class DashboardStore {
     this.validationMessage.set('');
   }
 
-  recordUploadedSources(sourceCount: number): void {
-    this.pendingSave.set({ uploadedSourceCount: sourceCount });
+  recordUploadedSources(sourceCount: number, documentIds: string[] = []): void {
+    this.pendingSave.set({ uploadedSourceCount: sourceCount, documentIds });
     this.validationMessage.set('');
   }
 
@@ -90,11 +96,19 @@ export class DashboardStore {
       return;
     }
 
-    await this.saveUseCase.execute({ name, uploadedSourceCount: pending.uploadedSourceCount });
-    this.pendingSave.set(null);
-    this.createFlowOpen.set(false);
-    this.validationMessage.set('');
-    await this.init();
+    try {
+      await this.saveUseCase.execute({
+        name,
+        uploadedSourceCount: pending.uploadedSourceCount,
+        documentIds: pending.documentIds,
+      });
+      this.pendingSave.set(null);
+      this.createFlowOpen.set(false);
+      this.validationMessage.set('');
+      await this.init();
+    } catch {
+      this.validationMessage.set('Could not create study space. Please try again.');
+    }
   }
 
   skipSaving(): void {

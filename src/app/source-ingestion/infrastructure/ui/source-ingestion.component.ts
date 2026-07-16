@@ -1,4 +1,4 @@
-import { Component, inject, output } from '@angular/core';
+import { Component, effect, inject, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
@@ -67,14 +67,7 @@ import { IngestionJob } from '../../domain/entities/IngestionJob';
     @if (store.ingestionJob(); as job) {
       <opo-status-panel [tone]="toneFor(job)" [title]="titleFor(job)" [message]="messageFor(job)">
         @if (job.status === ingestionStatus.PENDING || job.status === ingestionStatus.PROCESSING) {
-          <button
-            mat-button
-            type="button"
-            data-testid="refresh-ingestion"
-            (click)="onRefreshStatus()"
-          >
-            Refresh status
-          </button>
+          <!-- Polling runs automatically -->
         }
         @if (job.status === ingestionStatus.ERROR) {
           <button
@@ -133,9 +126,18 @@ import { IngestionJob } from '../../domain/entities/IngestionJob';
   styleUrl: './source-ingestion.component.css',
 })
 export class SourceIngestionComponent {
-  readonly sourceIngested = output<{ sourceCount: number }>();
+  readonly sourceIngested = output<{ sourceCount: number; documentIds: string[] }>();
   protected readonly store = inject(SourceIngestionStore);
   protected readonly ingestionStatus = IngestionStatus;
+
+  constructor() {
+    effect(() => {
+      const job = this.store.ingestionJob();
+      if (job?.status === IngestionStatus.DONE) {
+        this.sourceIngested.emit({ sourceCount: 1, documentIds: [job.jobId] });
+      }
+    });
+  }
 
   onFileSelected(file: File): void {
     this.store.selectSource(file);
@@ -143,14 +145,6 @@ export class SourceIngestionComponent {
 
   async onStartIngestion(): Promise<void> {
     await this.store.startIngestion();
-  }
-
-  async onRefreshStatus(): Promise<void> {
-    await this.store.refreshStatus();
-
-    if (this.store.ingestionJob()?.status === IngestionStatus.DONE) {
-      this.sourceIngested.emit({ sourceCount: 1 });
-    }
   }
 
   toneFor(job: IngestionJob): 'neutral' | 'info' | 'success' | 'warning' | 'error' {

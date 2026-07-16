@@ -1,11 +1,23 @@
 {
-  "/auth/**": {
+  "/auth": {
     "target": "http://localhost:8000",
     "secure": false,
     "changeOrigin": true,
     "logLevel": "debug"
   },
-  "/api/**": {
+  "/study-documents": {
+    "target": "http://localhost:8000",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+  "/study-spaces": {
+    "target": "http://localhost:8000",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+  "/semantic-search": {
     "target": "http://localhost:8000",
     "secure": false,
     "changeOrigin": true,

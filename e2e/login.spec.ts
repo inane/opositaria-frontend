@@ -28,6 +28,9 @@ test.describe('The login page', () => {
   });
 
   test('redirects authenticated users from login to dashboard', async ({ page }) => {
+    await page.route('**/study-spaces', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: '[]' });
+    });
     await page.goto('/login');
     await page.evaluate(() => localStorage.setItem('opositaria_token', 'test-token'));
 

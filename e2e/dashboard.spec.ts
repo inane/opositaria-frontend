@@ -1,9 +1,58 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('The study spaces dashboard', () => {
+  let createdSpaces: Array<{ id: string; name: string; document_count: number; created_at: string }> = [];
+
   test.beforeEach(async ({ page }) => {
+    createdSpaces = [];
+
     await page.goto('/login');
     await page.evaluate(() => localStorage.setItem('opositaria_token', 'test-token'));
+
+    // Stub backend HTTP calls for study spaces and document upload
+    await page.route('**/study-spaces', async (route) => {
+      if (route.request().method() === 'GET') {
+        await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(createdSpaces) });
+      } else if (route.request().method() === 'POST') {
+        const body = JSON.parse(route.request().postData() || '{}');
+        const newSpace = {
+          id: 'space-uuid',
+          name: body.name || 'Untitled',
+          document_count: 1,
+          created_at: new Date().toISOString(),
+        };
+        createdSpaces.push(newSpace);
+        await route.fulfill({
+          status: 201,
+          contentType: 'application/json',
+          body: JSON.stringify(newSpace),
+        });
+      } else {
+        await route.continue();
+      }
+    });
+
+    await page.route('**/study-documents/upload', async (route) => {
+      await route.fulfill({
+        status: 202,
+        contentType: 'application/json',
+        body: JSON.stringify({ document_id: 'doc-uuid', status: 'PENDING_PROCESSING' }),
+      });
+    });
+
+    await page.route('**/study-documents/*/status', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          document_id: 'doc-uuid',
+          filename: 'exam.pdf',
+          status: 'READY',
+          failure_reason: null,
+          chunks_count: 5,
+        }),
+      });
+    });
   });
 
   test('redirects visitors from the root path to the dashboard', async ({ page }) => {
@@ -47,10 +96,9 @@ test.describe('The study spaces dashboard', () => {
       buffer: Buffer.from('pdf content'),
     });
     await page.getByRole('button', { name: 'Start ingestion' }).click();
-    await page.getByTestId('refresh-ingestion').click();
-    await page.getByTestId('refresh-ingestion').click();
 
-    await expect(page.getByRole('heading', { name: 'Save study space' })).toBeVisible();
+    // Wait for polling to complete and ready status to appear
+    await expect(page.getByRole('heading', { name: 'Save study space' })).toBeVisible({ timeout: 10000 });
     await page.getByLabel('Study space name').fill('Constitución Española');
     await page.getByRole('button', { name: 'Save study space' }).click();
 
