@@ -10,10 +10,9 @@ export interface SaveStudySpaceRequest {
 export class SaveStudySpaceUseCase {
   constructor(private readonly repository: StudySpaceRepository) {}
 
-  async execute(request: SaveStudySpaceRequest): Promise<void> {
+  async execute(request: SaveStudySpaceRequest): Promise<StudySpace> {
     if (this.repository.createStudySpace && request.documentIds && request.documentIds.length > 0) {
-      await this.repository.createStudySpace(request.name, request.documentIds);
-      return;
+      return this.repository.createStudySpace(request.name, request.documentIds);
     }
 
     const space = StudySpace.create({
@@ -24,5 +23,6 @@ export class SaveStudySpaceUseCase {
     });
 
     await this.repository.save(space);
+    return space;
   }
 }

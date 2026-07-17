@@ -1,17 +1,15 @@
-import { Component, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { Router, RouterLink, RouterOutlet, NavigationEnd } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { DashboardStore } from '../store/dashboard-store.service';
-import { StudySpace } from '../../domain/entities/StudySpace';
-import { HttpStudySpaceAdapter } from '../adapters/HttpStudySpaceAdapter';
-import { ListStudySpacesUseCase } from '../../application/ListStudySpacesUseCase';
-import { SaveStudySpaceUseCase } from '../../application/SaveStudySpaceUseCase';
+import { DASHBOARD_STORE } from '../tokens/dashboard-store.token';
 import { SourceIngestionComponent } from '../../../source-ingestion/infrastructure/ui/source-ingestion.component';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-study-spaces-dashboard',
-  imports: [MatButtonModule, MatIconModule, SourceIngestionComponent],
+  imports: [MatButtonModule, MatIconModule, RouterLink, RouterOutlet, SourceIngestionComponent],
   template: `
     <div class="study-spaces-dashboard">
       <!-- Header -->
@@ -80,61 +78,69 @@ import { SourceIngestionComponent } from '../../../source-ingestion/infrastructu
       </div>
 
       <!-- Main content area -->
-      <main class="dashboard-content">
-        @if (store.isCreateFlowOpen()) {
-          @if (store.pendingSaveState(); as pendingSave) {
-            <section class="save-space-panel" aria-labelledby="save-space-title">
-              <h2 id="save-space-title">Save study space</h2>
-              <p>{{ pendingSave.uploadedSourceCount }} source ready.</p>
-              <label class="space-name-label" for="study-space-name">Study space name</label>
-              <input
-                id="study-space-name"
-                class="space-name-input"
-                #spaceName
-                type="text"
-                placeholder="My study space"
-              />
-              @if (store.saveValidationMessage(); as validationMessage) {
-                <p role="alert" class="validation-message">{{ validationMessage }}</p>
-              }
-              <div class="save-space-actions">
-                <button mat-stroked-button type="button" (click)="store.skipSaving()">Skip saving</button>
-                <button mat-flat-button type="button" (click)="store.savePendingSpace(spaceName.value)">
-                  Save study space
+      @if (!hasActiveChild()) {
+        <main class="dashboard-content">
+          @if (store.isCreateFlowOpen()) {
+            @if (store.pendingSaveState(); as pendingSave) {
+              <section class="save-space-panel" aria-labelledby="save-space-title">
+                <h2 id="save-space-title">Save study space</h2>
+                <p>{{ pendingSave.uploadedSourceCount }} source ready.</p>
+                <label class="space-name-label" for="study-space-name">Study space name</label>
+                <input
+                  id="study-space-name"
+                  class="space-name-input"
+                  #spaceName
+                  type="text"
+                  placeholder="My study space"
+                />
+                @if (store.saveValidationMessage(); as validationMessage) {
+                  <p role="alert" class="validation-message">{{ validationMessage }}</p>
+                }
+                <div class="save-space-actions">
+                  <button mat-stroked-button type="button" (click)="store.skipSaving()">Skip saving</button>
+                  <button mat-flat-button type="button" (click)="saveAndNavigate(spaceName.value)">
+                    Save study space
+                  </button>
+                </div>
+              </section>
+            } @else {
+              <app-source-ingestion (sourceIngested)="store.recordUploadedSources($event.sourceCount, $event.documentIds)" />
+              <button mat-button type="button" (click)="store.cancelCreation()">Cancel creation</button>
+            }
+          } @else if (emptyStateMessage; as message) {
+            <div class="dashboard-empty">
+              <mat-icon class="dashboard-empty-icon" aria-hidden="true">folder_open</mat-icon>
+              <p class="dashboard-empty-text">{{ message }}</p>
+              @if (message.startsWith('No study spaces')) {
+                <button mat-stroked-button type="button" (click)="store.openCreateFlow()">
+                  <mat-icon aria-hidden="true">add</mat-icon>
+                  Create new
                 </button>
-              </div>
-            </section>
+              }
+            </div>
           } @else {
-            <app-source-ingestion (sourceIngested)="store.recordUploadedSources($event.sourceCount, $event.documentIds)" />
-            <button mat-button type="button" (click)="store.cancelCreation()">Cancel creation</button>
+            <div class="dashboard-grid">
+              @for (space of store.visibleSpaces(); track space.id) {
+                <a
+                  class="space-card"
+                  [attr.aria-label]="space.title"
+                  [routerLink]="['/dashboard/spaces', space.id]"
+                >
+                  <div class="space-card-visual" aria-hidden="true">
+                    <mat-icon>description</mat-icon>
+                  </div>
+                  <div class="space-card-body">
+                    <h3 class="space-card-title">{{ space.title }}</h3>
+                    <p class="space-card-meta">{{ space.sourceCountLabel }}</p>
+                  </div>
+                </a>
+              }
+            </div>
           }
-        } @else if (emptyStateMessage; as message) {
-          <div class="dashboard-empty">
-            <mat-icon class="dashboard-empty-icon" aria-hidden="true">folder_open</mat-icon>
-            <p class="dashboard-empty-text">{{ message }}</p>
-            @if (message.startsWith('No study spaces')) {
-              <button mat-stroked-button type="button" (click)="store.openCreateFlow()">
-                <mat-icon aria-hidden="true">add</mat-icon>
-                Create new
-              </button>
-            }
-          </div>
-        } @else {
-          <div class="dashboard-grid">
-            @for (space of store.visibleSpaces(); track space.id) {
-              <article class="space-card" [attr.aria-label]="space.title">
-                <div class="space-card-visual" aria-hidden="true">
-                  <mat-icon>description</mat-icon>
-                </div>
-                <div class="space-card-body">
-                  <h3 class="space-card-title">{{ space.title }}</h3>
-                  <p class="space-card-meta">{{ space.sourceCountLabel }}</p>
-                </div>
-              </article>
-            }
-          </div>
-        }
-      </main>
+        </main>
+      } @else {
+        <router-outlet />
+      }
     </div>
   `,
   styles: [`
@@ -256,6 +262,8 @@ import { SourceIngestionComponent } from '../../../source-ingestion/infrastructu
       overflow: hidden;
       box-shadow: 0 1px 3px rgba(0,0,0,0.08);
       transition: box-shadow 0.2s, transform 0.2s;
+      text-decoration: none;
+      color: inherit;
     }
     .space-card:hover {
       box-shadow: 0 4px 12px rgba(0,0,0,0.12);
@@ -358,19 +366,28 @@ import { SourceIngestionComponent } from '../../../source-ingestion/infrastructu
     }
   `],
 })
-export class StudySpacesDashboardComponent {
-  private readonly http = inject(HttpClient);
-  readonly store: DashboardStore;
+export class StudySpacesDashboardComponent implements OnInit {
+  private readonly router = inject(Router);
+  readonly store = inject(DASHBOARD_STORE);
+  readonly hasActiveChild = signal(false);
 
-  constructor() {
-    const repository = new HttpStudySpaceAdapter(this.http);
-    this.store = new DashboardStore(
-      new ListStudySpacesUseCase(repository),
-      new SaveStudySpaceUseCase(repository),
-    );
+  ngOnInit(): void {
+    this.hasActiveChild.set(this.router.url !== '/dashboard');
+    this.router.events
+      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+      .subscribe((event) => {
+        this.hasActiveChild.set(event.urlAfterRedirects !== '/dashboard');
+      });
     void this.store.init();
   }
 
   protected get emptyStateMessage() { return this.store.emptyStateReason(); }
   protected get activeFilter() { return this.store.activeFilter(); }
+
+  async saveAndNavigate(name: string): Promise<void> {
+    const createdId = await this.store.savePendingSpace(name);
+    if (createdId) {
+      void this.router.navigate(['/dashboard/spaces', createdId]);
+    }
+  }
 }

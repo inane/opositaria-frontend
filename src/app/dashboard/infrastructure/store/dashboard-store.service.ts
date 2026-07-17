@@ -85,19 +85,19 @@ export class DashboardStore {
     this.validationMessage.set('');
   }
 
-  async savePendingSpace(name: string): Promise<void> {
+  async savePendingSpace(name: string): Promise<string | null> {
     const pending = this.pendingSave();
     if (!pending) {
-      return;
+      return null;
     }
 
     if (name.trim().length === 0) {
       this.validationMessage.set('A name is required to save the study space');
-      return;
+      return null;
     }
 
     try {
-      await this.saveUseCase.execute({
+      const createdSpace = await this.saveUseCase.execute({
         name,
         uploadedSourceCount: pending.uploadedSourceCount,
         documentIds: pending.documentIds,
@@ -106,8 +106,10 @@ export class DashboardStore {
       this.createFlowOpen.set(false);
       this.validationMessage.set('');
       await this.init();
+      return createdSpace.id;
     } catch {
       this.validationMessage.set('Could not create study space. Please try again.');
+      return null;
     }
   }
 
