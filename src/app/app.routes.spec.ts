@@ -9,6 +9,13 @@ import { TokenStorageService } from './auth/infrastructure/adapters/TokenStorage
 import { StudySpacesDashboardComponent } from './dashboard/infrastructure/ui/study-spaces-dashboard.component';
 import { SOURCE_INGESTION_PORT } from './source-ingestion/infrastructure/tokens/source-ingestion-port.token';
 import { FakeSourceIngestionAdapter } from './source-ingestion/infrastructure/adapters/FakeSourceIngestionAdapter';
+import { DASHBOARD_STORE } from './dashboard/infrastructure/tokens/dashboard-store.token';
+import { DashboardStore } from './dashboard/infrastructure/store/dashboard-store.service';
+
+const dashboardProviders = [
+  { provide: SOURCE_INGESTION_PORT, useClass: FakeSourceIngestionAdapter },
+  { provide: DASHBOARD_STORE, useValue: {} as DashboardStore },
+];
 
 describe('The app routes', () => {
   afterEach(() => {
@@ -21,7 +28,7 @@ describe('The app routes', () => {
         provideRouter(routes),
         AuthGuard,
         TokenStorageService,
-        { provide: SOURCE_INGESTION_PORT, useClass: FakeSourceIngestionAdapter },
+        ...dashboardProviders,
       ],
     });
     const storage = TestBed.inject(TokenStorageService);
@@ -37,7 +44,7 @@ describe('The app routes', () => {
 
   it('unauthenticated root redirects to login', async () => {
     TestBed.configureTestingModule({
-      providers: [provideRouter(routes), AuthGuard, TokenStorageService],
+      providers: [provideRouter(routes), AuthGuard, TokenStorageService, ...dashboardProviders],
     });
     TestBed.inject(TokenStorageService).clear();
 
@@ -50,7 +57,7 @@ describe('The app routes', () => {
 
   it('unauthenticated dashboard redirects to login', async () => {
     TestBed.configureTestingModule({
-      providers: [provideRouter(routes), AuthGuard, TokenStorageService],
+      providers: [provideRouter(routes), AuthGuard, TokenStorageService, ...dashboardProviders],
     });
     TestBed.inject(TokenStorageService).clear();
 
@@ -67,7 +74,7 @@ describe('The app routes', () => {
         provideRouter(routes),
         AuthGuard,
         TokenStorageService,
-        { provide: SOURCE_INGESTION_PORT, useClass: FakeSourceIngestionAdapter },
+        ...dashboardProviders,
       ],
     });
     const storage = TestBed.inject(TokenStorageService);
